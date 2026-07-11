@@ -101,6 +101,8 @@ class WebCommand extends Command
             if (! $server->isRunning()) {
                 $output->writeln('<error>The installer web server stopped unexpectedly.</error>');
 
+                $this->removePublicGateway();
+
                 return self::FAILURE;
             }
 
@@ -109,6 +111,8 @@ class WebCommand extends Command
             if (file_exists($quitFile)) {
                 $output->writeln('  Installer closed from the browser. Goodbye!');
                 $server->stop();
+
+                $this->removePublicGateway();
 
                 return self::SUCCESS;
             }
@@ -367,6 +371,15 @@ class WebCommand extends Command
 
         file_put_contents($temporaryGateway, json_encode(['port' => $port], JSON_UNESCAPED_SLASHES), LOCK_EX);
         rename($temporaryGateway, $gateway);
+    }
+
+    /**
+     * Remove the public gateway file so the Herd front controller reports
+     * the installer as offline instead of proxying to a dead port.
+     */
+    protected function removePublicGateway(): void
+    {
+        @unlink(join_paths(dirname(__DIR__), 'public', '.web-installer.json'));
     }
 
     /**
