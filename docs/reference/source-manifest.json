@@ -1,0 +1,8 @@
+{
+    "bin/laravel": "01869bf56ac04fdf9bd52d2be5359793c976f72e14d08af651804fb8ec3dc294",
+    "src/NewCommand.php": "64431144b28bf310828da3afab59c38138956f5723d33c63f3f74f705bff4f37",
+    "src/PackageCommand.php": "6c8c7c5470f9646c013bc8160d505f2c4e9c28b2a2add5bc34deee49660e7733",
+    "src/WebCommand.php": "048cc9d1cdb58e1140ee1d287a967b3e4da7fa856b02ea2709797adae491bfb8",
+    "src/Web/router.php": "19e716aa9eb9df7d2a5adb44cb062ff3b7b4333a52fa7d5992d4af021b5da6df",
+    "src/Agent.php": "19a1676643c2589f5138f0063099ee86337c4c4307c0107c14c8eb5af2d16e9c"
+}

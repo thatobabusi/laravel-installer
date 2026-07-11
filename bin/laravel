@@ -12,9 +12,11 @@ $app = new Symfony\Component\Console\Application('Laravel Installer', '5.30.0');
 if (method_exists($app, 'addCommand')) {
     $app->addCommand(new Laravel\Installer\Console\NewCommand);
     $app->addCommand(new Laravel\Installer\Console\PackageCommand);
+    $app->addCommand(new Laravel\Installer\Console\WebCommand);
 } else {
     $app->add(new Laravel\Installer\Console\NewCommand);
     $app->add(new Laravel\Installer\Console\PackageCommand);
+    $app->add(new Laravel\Installer\Console\WebCommand);
 }
 
 $app->run();

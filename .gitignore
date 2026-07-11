@@ -3,3 +3,6 @@ composer.lock
 phpunit.xml
 .phpunit.result.cache
 /.idea
+
+/public/.web-installer.json
+/public/.web-installer.json.tmp

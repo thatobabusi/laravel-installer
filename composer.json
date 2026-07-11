@@ -38,6 +38,10 @@
             "Laravel\\Installer\\Console\\Tests\\": "tests/"
         }
     },
+    "scripts": {
+        "docs:update": "@php scripts/sync-docs.php",
+        "docs:check": "@php scripts/sync-docs.php --check"
+    },
     "config": {
         "sort-packages": true
     },

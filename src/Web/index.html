@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laravel Installer</title>
+<style>
+    :root {
+        --bg: #0a0a0a;
+        --card: #161615;
+        --card-2: #1d1d1b;
+        --border: #2e2e2b;
+        --text: #ededec;
+        --muted: #a1a09a;
+        --accent: #f53003;
+        --accent-soft: rgba(245, 48, 3, 0.12);
+        --green: #22c55e;
+        --yellow: #eab308;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 16px;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .logo svg { width: 36px; height: 38px; }
+    .logo h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+    .logo span { color: var(--muted); font-weight: 400; }
+    .shell { width: 100%; max-width: 640px; }
+    .steps { display: flex; gap: 8px; margin-bottom: 20px; }
+    .steps .dot {
+        flex: 1; height: 4px; border-radius: 2px;
+        background: var(--border); transition: background .3s;
+    }
+    .steps .dot.active { background: var(--accent); }
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 28px;
+    }
+    .card h2 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+    .card p.sub { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
+    .field { margin-bottom: 20px; }
+    .field label.title { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+    input[type=text] {
+        width: 100%; padding: 10px 14px; font-size: 15px;
+        background: var(--card-2); color: var(--text);
+        border: 1px solid var(--border); border-radius: 8px; outline: none;
+    }
+    input[type=text]:focus { border-color: var(--accent); }
+    .hint { font-size: 13px; color: var(--muted); margin-top: 8px; word-break: break-all; }
+    .hint.error { color: var(--accent); }
+    .hint.ok { color: var(--green); }
+    .options { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .options.wide { grid-template-columns: 1fr 1fr; }
+    .opt {
+        background: var(--card-2); border: 1px solid var(--border);
+        border-radius: 8px; padding: 12px 14px; cursor: pointer;
+        transition: border-color .15s, background .15s;
+        user-select: none;
+    }
+    .opt:hover { border-color: #4a4a45; }
+    .opt.selected { border-color: var(--accent); background: var(--accent-soft); }
+    .opt.disabled { opacity: 0.45; cursor: not-allowed; }
+    .opt .name { font-size: 14px; font-weight: 500; }
+    .opt .desc { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .toggle-row {
+        display: flex; align-items: center; justify-content: space-between;
+        background: var(--card-2); border: 1px solid var(--border);
+        border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer;
+        user-select: none;
+    }
+    .toggle-row .label .name { font-size: 14px; font-weight: 500; }
+    .toggle-row .label .desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .switch {
+        width: 40px; height: 22px; border-radius: 11px; background: var(--border);
+        position: relative; transition: background .2s; flex-shrink: 0; margin-left: 16px;
+    }
+    .switch::after {
+        content: ''; position: absolute; top: 3px; left: 3px;
+        width: 16px; height: 16px; border-radius: 50%; background: var(--text);
+        transition: left .2s;
+    }
+    .toggle-row.on .switch { background: var(--accent); }
+    .toggle-row.on .switch::after { left: 21px; }
+    .nav { display: flex; justify-content: space-between; margin-top: 26px; }
+    button {
+        font-size: 14px; font-weight: 500; padding: 10px 22px;
+        border-radius: 8px; border: 1px solid var(--border);
+        background: var(--card-2); color: var(--text); cursor: pointer;
+    }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    button.primary:hover { background: #d92a02; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    details { margin-top: 6px; }
+    details summary { font-size: 13px; color: var(--muted); cursor: pointer; margin-bottom: 10px; }
+    .summary-table { width: 100%; font-size: 14px; border-collapse: collapse; }
+    .summary-table td { padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .summary-table td:first-child { color: var(--muted); width: 40%; }
+    .cli {
+        margin-top: 18px; background: #000; border: 1px solid var(--border);
+        border-radius: 8px; padding: 14px; font-family: ui-monospace, Consolas, monospace;
+        font-size: 13px; color: var(--green); word-break: break-all;
+    }
+    .terminal {
+        background: #000; border: 1px solid var(--border); border-radius: 8px;
+        padding: 14px; height: 320px; overflow-y: auto;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 12.5px; color: #d4d4d4; white-space: pre-wrap; word-break: break-all;
+    }
+    .spinner {
+        display: inline-block; width: 14px; height: 14px; margin-right: 8px;
+        border: 2px solid var(--border); border-top-color: var(--accent);
+        border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .result-banner {
+        border-radius: 8px; padding: 16px; margin-bottom: 18px; font-size: 14px;
+    }
+    .result-banner.success { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.4); }
+    .result-banner.failed { background: var(--accent-soft); border: 1px solid var(--accent); }
+    .result-banner a { color: var(--green); }
+    .next-steps { font-size: 14px; color: var(--muted); margin-top: 14px; line-height: 1.9; }
+    .next-steps code {
+        background: var(--card-2); border: 1px solid var(--border);
+        padding: 2px 7px; border-radius: 5px; font-size: 13px; color: var(--text);
+    }
+    .hidden { display: none !important; }
+</style>
+</head>
+<body>
+    <div class="logo">
+        <svg viewBox="0 0 50 52" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M49.626 11.564a.809.809 0 0 1 .028.209v10.972a.8.8 0 0 1-.402.694l-9.209 5.302V39.25c0 .286-.152.55-.4.694L20.42 51.01c-.044.025-.092.041-.14.058-.018.006-.035.017-.054.022a.805.805 0 0 1-.41 0c-.022-.006-.042-.018-.063-.026-.044-.016-.09-.03-.132-.054L.402 39.944A.801.801 0 0 1 0 39.25V6.334c0-.072.01-.142.028-.21.006-.023.02-.044.028-.067.015-.042.029-.085.051-.124.015-.026.037-.047.055-.071.023-.032.044-.065.071-.093.023-.023.053-.04.079-.06.029-.024.055-.05.088-.069h.001l9.61-5.533a.802.802 0 0 1 .8 0l9.61 5.533h.002c.032.02.059.045.088.068.026.02.055.038.078.06.028.029.048.062.072.094.017.024.04.045.054.071.023.04.036.082.052.124.008.023.022.044.028.068a.809.809 0 0 1 .028.209v20.559l8.008-4.611v-10.51c0-.07.01-.141.028-.208.007-.024.02-.045.028-.068.016-.042.03-.085.052-.124.015-.026.037-.047.054-.071.024-.032.044-.065.072-.093.023-.023.052-.04.078-.06.03-.024.056-.05.088-.069h.001l9.611-5.533a.801.801 0 0 1 .8 0l9.61 5.533c.034.02.06.045.09.068.025.02.054.038.077.06.028.029.048.062.072.094.018.024.04.045.054.071.023.039.036.082.052.124.009.023.022.044.028.068Z" fill="#F53003"/></svg>
+        <h1>Laravel <span>Web Installer</span></h1>
+    </div>
+
+    <div class="shell">
+        <div class="steps" id="stepDots"></div>
+
+        <!-- Step 1: Project -->
+        <div class="card step" data-step="0">
+            <h2>Name your project</h2>
+            <p class="sub">The application will be created inside <span id="targetDir">…</span></p>
+            <div class="field">
+                <label class="title" for="name">Project name</label>
+                <input type="text" id="name" placeholder="my-app" autocomplete="off" autofocus>
+                <div class="hint" id="nameHint">Letters, numbers, dashes, underscores, and periods only.</div>
+            </div>
+            <div class="nav">
+                <span></span>
+                <button class="primary" id="nameNext" disabled>Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Stack -->
+        <div class="card step hidden" data-step="1">
+            <h2>Choose your stack</h2>
+            <p class="sub">Pick a starter kit with authentication scaffolding, or start from a blank slate.</p>
+
+            <div class="field">
+                <label class="title">Setup</label>
+                <div class="options wide">
+                    <div class="opt" data-group="starterKit" data-value="yes">
+                        <div class="name">Starter kit</div>
+                        <div class="desc">Auth scaffolding, profile settings, ready-made UI</div>
+                    </div>
+                    <div class="opt" data-group="starterKit" data-value="no">
+                        <div class="name">Blank</div>
+                        <div class="desc">Minimal skeleton, no authentication</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="title">Frontend stack</label>
+                <div class="options" id="stackOptions"></div>
+            </div>
+
+            <div class="field hidden" id="authField">
+                <label class="title">Authentication provider</label>
+                <div class="options wide">
+                    <div class="opt" data-group="auth" data-value="laravel">
+                        <div class="name">Laravel</div>
+                        <div class="desc">Built-in authentication</div>
+                    </div>
+                    <div class="opt" data-group="auth" data-value="workos">
+                        <div class="name">WorkOS</div>
+                        <div class="desc">Requires a WorkOS account</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toggle-row hidden" id="livewireSingleFile" data-toggle="singleFile">
+                <div class="label">
+                    <div class="name">Single-file Livewire components</div>
+                    <div class="desc">Turn off to generate stand-alone class components</div>
+                </div>
+                <div class="switch"></div>
+            </div>
+
+            <div class="toggle-row hidden" id="teamsToggle" data-toggle="teams">
+                <div class="label">
+                    <div class="name">Teams support</div>
+                    <div class="desc">Add team management to your application</div>
+                </div>
+                <div class="switch"></div>
+            </div>
+
+            <details>
+                <summary>Use a community starter kit instead</summary>
+                <input type="text" id="using" placeholder="vendor/package (overrides the options above)" autocomplete="off">
+            </details>
+
+            <div class="nav">
+                <button data-nav="back">Back</button>
+                <button class="primary" data-nav="next">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Options -->
+        <div class="card step hidden" data-step="2">
+            <h2>Application options</h2>
+            <p class="sub">Database, testing, and tooling for the new application.</p>
+
+            <div class="field">
+                <label class="title">Database</label>
+                <div class="options" id="dbOptions"></div>
+            </div>
+
+            <div class="field">
+                <label class="title">Testing framework</label>
+                <div class="options wide">
+                    <div class="opt" data-group="testing" data-value="pest"><div class="name">Pest</div></div>
+                    <div class="opt" data-group="testing" data-value="phpunit"><div class="name">PHPUnit</div></div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="title">Node dependencies</label>
+                <div class="options">
+                    <div class="opt" data-group="node" data-value="npm"><div class="name">npm</div></div>
+                    <div class="opt" data-group="node" data-value="pnpm"><div class="name">pnpm</div></div>
+                    <div class="opt" data-group="node" data-value="bun"><div class="name">Bun</div></div>
+                    <div class="opt" data-group="node" data-value="yarn"><div class="name">Yarn</div></div>
+                    <div class="opt" data-group="node" data-value="skip"><div class="name">Skip</div></div>
+                </div>
+            </div>
+
+            <div class="toggle-row on" data-toggle="boost">
+                <div class="label">
+                    <div class="name">Laravel Boost</div>
+                    <div class="desc">Improve AI assisted coding with MCP tooling</div>
+                </div>
+                <div class="switch"></div>
+            </div>
+
+            <div class="nav">
+                <button data-nav="back">Back</button>
+                <button class="primary" data-nav="next">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Git -->
+        <div class="card step hidden" data-step="3">
+            <h2>Version control</h2>
+            <p class="sub">Optionally initialize Git and create a GitHub repository.</p>
+
+            <div class="toggle-row" data-toggle="git">
+                <div class="label">
+                    <div class="name">Initialize a Git repository</div>
+                    <div class="desc">git init + an initial commit</div>
+                </div>
+                <div class="switch"></div>
+            </div>
+
+            <div class="field">
+                <label class="title">GitHub repository</label>
+                <div class="options">
+                    <div class="opt" data-group="github" data-value="none"><div class="name">None</div></div>
+                    <div class="opt" data-group="github" data-value="private"><div class="name">Private</div></div>
+                    <div class="opt" data-group="github" data-value="public"><div class="name">Public</div></div>
+                </div>
+                <div class="hint">Requires the <b>gh</b> CLI to be installed and authenticated.</div>
+            </div>
+
+            <div class="field hidden" id="orgField">
+                <label class="title" for="organization">GitHub organization (optional)</label>
+                <input type="text" id="organization" placeholder="my-org" autocomplete="off">
+            </div>
+
+            <div class="nav">
+                <button data-nav="back">Back</button>
+                <button class="primary" data-nav="next">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 5: Review -->
+        <div class="card step hidden" data-step="4">
+            <h2>Review &amp; install</h2>
+            <p class="sub">Everything the installer is about to do.</p>
+            <table class="summary-table" id="summaryTable"></table>
+            <div class="cli" id="cliPreview"></div>
+            <div class="nav">
+                <button data-nav="back">Back</button>
+                <button class="primary" id="installBtn">Install</button>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="card step hidden" data-step="5">
+            <h2 id="progressTitle"><span class="spinner"></span>Creating your application…</h2>
+            <p class="sub" id="progressSub">This can take a few minutes while Composer and npm do their thing.</p>
+            <div id="resultBanner"></div>
+            <div class="terminal" id="terminal"></div>
+            <div class="nav">
+                <button id="anotherBtn" class="hidden">Create another app</button>
+                <button id="quitBtn" class="hidden primary">Close installer</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+(() => {
+    const state = {
+        name: '',
+        nameValid: false,
+        starterKit: 'yes',
+        stack: 'react',
+        using: '',
+        auth: 'laravel',
+        singleFile: true,
+        teams: false,
+        database: 'sqlite',
+        testing: 'pest',
+        node: 'npm',
+        boost: true,
+        git: false,
+        github: 'none',
+        organization: '',
+    };
+
+    let env = { databases: {}, targetDirectory: '', separator: '/' };
+    let currentStep = 0;
+    const stepCount = 6;
+
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => [...document.querySelectorAll(sel)];
+
+    // --- Step navigation -------------------------------------------------
+    const dots = $('#stepDots');
+    for (let i = 0; i < stepCount - 1; i++) {
+        const d = document.createElement('div');
+        d.className = 'dot';
+        dots.appendChild(d);
+    }
+
+    function showStep(n) {
+        currentStep = n;
+        $$('.step').forEach(el => el.classList.toggle('hidden', +el.dataset.step !== n));
+        $$('#stepDots .dot').forEach((d, i) => d.classList.toggle('active', i <= Math.min(n, stepCount - 2)));
+        if (n === 4) renderSummary();
+    }
+
+    document.addEventListener('click', (e) => {
+        const nav = e.target.closest('[data-nav]');
+        if (nav) showStep(currentStep + (nav.dataset.nav === 'next' ? 1 : -1));
+    });
+
+    // --- Option cards & toggles ------------------------------------------
+    document.addEventListener('click', (e) => {
+        const opt = e.target.closest('.opt');
+        if (opt && !opt.classList.contains('disabled') && opt.dataset.group) {
+            state[opt.dataset.group] = opt.dataset.value;
+            syncUi();
+        }
+        const toggle = e.target.closest('[data-toggle]');
+        if (toggle) {
+            state[toggle.dataset.toggle] = !state[toggle.dataset.toggle];
+            syncUi();
+        }
+    });
+
+    $('#using').addEventListener('input', (e) => { state.using = e.target.value.trim(); syncUi(); });
+    $('#organization').addEventListener('input', (e) => { state.organization = e.target.value.trim(); });
+
+    function renderStacks() {
+        const kit = state.starterKit === 'yes';
+        const stacks = kit
+            ? [['react', 'React'], ['svelte', 'Svelte'], ['vue', 'Vue'], ['livewire', 'Livewire']]
+            : [['blade', 'Blade'], ['react', 'React'], ['svelte', 'Svelte'], ['vue', 'Vue'], ['livewire', 'Livewire']];
+
+        if (!stacks.some(([v]) => v === state.stack)) state.stack = stacks[0][0];
+
+        $('#stackOptions').innerHTML = stacks.map(([v, label]) => {
+            const desc = v === 'blade' ? 'No frontend scaffolding'
+                : v === 'livewire' ? 'Laravel, Livewire, Tailwind'
+                : `Laravel, Inertia, ${label}, Tailwind`;
+            return `<div class="opt" data-group="stack" data-value="${v}"><div class="name">${label}</div><div class="desc">${desc}</div></div>`;
+        }).join('');
+    }
+
+    function renderDatabases() {
+        const labels = { sqlite: 'SQLite', mysql: 'MySQL', mariadb: 'MariaDB', pgsql: 'PostgreSQL', sqlsrv: 'SQL Server' };
+        $('#dbOptions').innerHTML = Object.entries(labels).map(([v, label]) => {
+            const available = env.databases[v] !== false;
+            return `<div class="opt ${available ? '' : 'disabled'}" ${available ? `data-group="database" data-value="${v}"` : ''}>
+                <div class="name">${label}</div>${available ? '' : '<div class="desc">Missing PDO extension</div>'}</div>`;
+        }).join('');
+    }
+
+    function syncUi() {
+        renderStacks();
+        renderDatabases();
+
+        $$('.opt[data-group]').forEach(opt => {
+            opt.classList.toggle('selected', state[opt.dataset.group] === opt.dataset.value);
+        });
+        $$('[data-toggle]').forEach(t => t.classList.toggle('on', !!state[t.dataset.toggle]));
+
+        const kit = state.starterKit === 'yes' && !state.using;
+        $('#authField').classList.toggle('hidden', !kit);
+        $('#livewireSingleFile').classList.toggle('hidden', !(kit && state.stack === 'livewire' && state.auth === 'laravel'));
+        $('#teamsToggle').classList.toggle('hidden', !(kit && (state.stack !== 'livewire' || state.auth === 'workos' || state.singleFile)));
+        $('#orgField').classList.toggle('hidden', state.github === 'none');
+    }
+
+    // --- Name validation --------------------------------------------------
+    let nameTimer;
+    let nameValidationRequest = 0;
+
+    $('#name').addEventListener('input', (e) => {
+        state.name = e.target.value.trim();
+        state.nameValid = false;
+        $('#nameNext').disabled = true;
+        clearTimeout(nameTimer);
+
+        const request = ++nameValidationRequest;
+
+        if (!state.name) {
+            setHint('Letters, numbers, dashes, underscores, and periods only.', '');
+            return;
+        }
+
+        nameTimer = setTimeout(() => checkName(request, state.name), 300);
+    });
+
+    async function checkName(request, name) {
+        try {
+            const res = await fetch(`/api/check-name?name=${encodeURIComponent(name)}`);
+            const data = await res.json();
+
+            // Ignore a response for a value the user has already changed.
+            if (request !== nameValidationRequest) return;
+
+            state.nameValid = data.valid === true;
+            $('#nameNext').disabled = !state.nameValid;
+            setHint(state.nameValid ? `Will be created at ${data.directory}` : (data.error || 'The project name is not available.'), state.nameValid ? 'ok' : 'error');
+        } catch {
+            if (request !== nameValidationRequest) return;
+
+            state.nameValid = false;
+            $('#nameNext').disabled = true;
+            setHint('Unable to validate the project name. Check that the installer server is still running.', 'error');
+        }
+    }
+
+    function setHint(text, cls) {
+        const el = $('#nameHint');
+        el.textContent = text;
+        el.className = `hint ${cls}`;
+    }
+
+    function advanceFromName(event) {
+        event?.preventDefault();
+
+        if (state.nameValid) showStep(1);
+    }
+
+    $('#nameNext').addEventListener('click', advanceFromName);
+    $('#name').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') advanceFromName(e);
+    });
+
+    // --- Summary -----------------------------------------------------------
+    function jobPayload() {
+        return {
+            name: state.name,
+            starterKit: state.starterKit === 'yes',
+            stack: state.stack,
+            using: state.using || null,
+            auth: state.auth,
+            livewireClassComponents: !state.singleFile,
+            teams: state.teams,
+            database: state.database,
+            testing: state.testing,
+            node: state.node,
+            boost: state.boost,
+            git: state.git,
+            github: state.github,
+            organization: state.organization || null,
+        };
+    }
+
+    function cliCommand() {
+        const parts = ['laravel new', state.name];
+        if (state.using) {
+            parts.push(`--using=${state.using}`);
+        } else if (state.starterKit === 'yes') {
+            parts.push(`--${state.stack}`);
+            if (state.auth === 'workos') parts.push('--workos');
+            if (state.stack === 'livewire' && !state.singleFile) parts.push('--livewire-class-components');
+            if (state.teams) parts.push('--teams');
+        } else {
+            if (state.stack !== 'blade') parts.push(`--${state.stack}`);
+            parts.push('--no-authentication');
+        }
+        parts.push(`--database=${state.database}`);
+        parts.push(state.testing === 'phpunit' ? '--phpunit' : '--pest');
+        parts.push({ npm: '--npm', pnpm: '--pnpm', bun: '--bun', yarn: '--yarn', skip: '--no-node' }[state.node]);
+        parts.push(state.boost ? '--boost' : '--no-boost');
+        if (state.github !== 'none') {
+            parts.push(state.github === 'public' ? '--github=--public' : '--github');
+            if (state.organization) parts.push(`--organization=${state.organization}`);
+        } else if (state.git) {
+            parts.push('--git');
+        }
+        parts.push('--no-interaction');
+        return parts.join(' ');
+    }
+
+    function renderSummary() {
+        const rows = [];
+        rows.push(['Project', state.name]);
+        rows.push(['Location', env.targetDirectory + env.separator + state.name]);
+        if (state.using) {
+            rows.push(['Starter kit', state.using]);
+        } else if (state.starterKit === 'yes') {
+            rows.push(['Starter kit', `${state.stack} (official)`]);
+            rows.push(['Authentication', state.auth === 'workos' ? 'WorkOS' : 'Laravel built-in']);
+            if (state.stack === 'livewire') rows.push(['Livewire components', state.singleFile ? 'Single-file' : 'Class components']);
+            if (state.teams) rows.push(['Teams', 'Enabled']);
+        } else {
+            rows.push(['Stack', `${state.stack} (blank, no authentication)`]);
+        }
+        rows.push(['Database', state.database]);
+        rows.push(['Testing', state.testing === 'phpunit' ? 'PHPUnit' : 'Pest']);
+        rows.push(['Node packages', state.node === 'skip' ? 'Skipped' : state.node]);
+        rows.push(['Laravel Boost', state.boost ? 'Yes' : 'No']);
+        rows.push(['Git', state.github !== 'none' ? `GitHub (${state.github})${state.organization ? ' · ' + state.organization : ''}` : (state.git ? 'Local repository' : 'No')]);
+
+        $('#summaryTable').innerHTML = rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+        $('#cliPreview').textContent = '$ ' + cliCommand();
+    }
+
+    // --- Install & progress -------------------------------------------------
+    let logOffset = 0;
+    let polling = null;
+    let pollFailures = 0;
+
+    $('#installBtn').addEventListener('click', async () => {
+        $('#installBtn').disabled = true;
+        const res = await fetch('/api/install', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(jobPayload()),
+        });
+        $('#installBtn').disabled = false;
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            alert(err.error || 'Failed to start the installation.');
+            return;
+        }
+        logOffset = 0;
+        $('#terminal').textContent = '';
+        $('#resultBanner').innerHTML = '';
+        showStep(5);
+        polling = setInterval(poll, 1000);
+    });
+
+    async function poll() {
+        let data;
+        try {
+            const res = await fetch(`/api/status?offset=${logOffset}`);
+            data = await res.json();
+        } catch { return; }
+
+        if (data.log) {
+            const term = $('#terminal');
+            term.textContent += data.log;
+            term.scrollTop = term.scrollHeight;
+        }
+        logOffset = data.offset;
+
+        const s = data.status || {};
+        if (s.state === 'queued') {
+            $('#progressSub').textContent = 'Waiting for the installer worker to start...';
+        }
+        if (s.state === 'success') {
+            finish(true, s);
+        } else if (s.state === 'failed') {
+            finish(false, s);
+        }
+    }
+
+    function finish(success, s) {
+        clearInterval(polling);
+        polling = null;
+        $('#progressTitle').innerHTML = success ? '✅ Application ready' : '❌ Installation failed';
+        $('#progressSub').textContent = success ? 'Your new Laravel application is ready to go.' : (s.error || 'Something went wrong.');
+        $('#anotherBtn').classList.remove('hidden');
+        $('#quitBtn').classList.remove('hidden');
+
+        if (success) {
+            $('#resultBanner').innerHTML = `
+                <div class="result-banner success">
+                    <b>${s.name}</b> was created at <b>${s.directory}</b>
+                    <div class="next-steps">
+                        1. <code>cd ${s.name}</code><br>
+                        2. Open <a href="${s.url}" target="_blank">${s.url}</a> or run <code>composer run dev</code>
+                    </div>
+                </div>`;
+        } else {
+            $('#resultBanner').innerHTML = `<div class="result-banner failed">${s.error || 'The installation failed.'} The log below has the details.</div>`;
+        }
+    }
+
+    $('#anotherBtn').addEventListener('click', () => {
+        $('#name').value = '';
+        state.name = '';
+        state.nameValid = false;
+        $('#nameNext').disabled = true;
+        setHint('Letters, numbers, dashes, underscores, and periods only.', '');
+        $('#progressTitle').innerHTML = '<span class="spinner"></span>Creating your application…';
+        $('#anotherBtn').classList.add('hidden');
+        $('#quitBtn').classList.add('hidden');
+        showStep(0);
+    });
+
+    $('#quitBtn').addEventListener('click', async () => {
+        await fetch('/api/quit', { method: 'POST' });
+        document.body.innerHTML = '<div style="margin:auto;color:#a1a09a;font-size:15px">The installer has been closed. You can close this tab.</div>';
+    });
+
+    // --- Boot ----------------------------------------------------------------
+    fetch('/api/env').then(r => r.json()).then(data => {
+        env = data;
+        $('#targetDir').textContent = env.targetDirectory;
+        if (env.databases.sqlite === false) state.database = 'mysql';
+        syncUi();
+    });
+
+    syncUi();
+    showStep(0);
+})();
+</script>
+</body>
+</html>

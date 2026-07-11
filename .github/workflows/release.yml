@@ -1,0 +1,66 @@
+name: Release installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (X.Y.Z, without v)'
+        required: true
+        type: string
+      notes:
+        description: 'Optional release notes (Markdown). Leave blank to generate notes automatically.'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Validate release version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Version must use X.Y.Z format."; exit 1; }
+          git rev-parse "v$VERSION" >/dev/null 2>&1 && { echo "::error::Tag v$VERSION already exists."; exit 1; }
+
+      - name: Update installer version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          sed -Ei "s/(Laravel Installer', ')[^']+(')/\\1$VERSION\\2/" bin/laravel
+          grep -F "'Laravel Installer', '$VERSION'" bin/laravel
+
+      - name: Commit and tag release
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bin/laravel
+          git commit -m "v$VERSION"
+          git tag -a "v$VERSION" -m "v$VERSION"
+          git push origin HEAD:${{ github.ref_name }}
+          git push origin "v$VERSION"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          NOTES: ${{ inputs.notes }}
+        run: |
+          if [ -n "$NOTES" ]; then
+            gh release create "v$VERSION" --title "v$VERSION" --notes "$NOTES"
+          else
+            gh release create "v$VERSION" --title "v$VERSION" --generate-notes
+          fi
