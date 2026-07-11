@@ -51,7 +51,7 @@ laravel web               # the same wizard, in your browser
 <h2 align="center">✨ Features</h2>
 
 - 🚀 **Everything upstream** — starter kits (React, Svelte, Vue, Livewire), WorkOS auth, teams, database setup, Pest/PHPUnit, npm/pnpm/bun/yarn, Laravel Boost, Git and GitHub publishing.
-- 🎨 **Vanilla UI presets** — scaffold blank Blade applications with **Bootstrap 5** or **CoreUI 5** instead of Tailwind via `--ui=bootstrap|coreui`, in the CLI and the web wizard.
+- 🎨 **Vanilla UI presets** — scaffold blank applications with **Bootstrap 5**, **CoreUI 5**, **AdminLTE 4**, the **Laravel AdminLTE** package, or an **Angular** SPA via `--ui=...`, in the CLI and the web wizard.
 - 🌐 **Web installer** — `laravel web` serves a local wizard that walks every `laravel new` option, live-validates the project name, disables databases with missing PDO extensions, shows the equivalent CLI command before installing, and streams the install log to your browser.
 - 🔒 **Loopback-only by design** — the web UI binds to `127.0.0.1`; an optional [Herd front controller](public/index.php) proxies it at a friendly `.test` domain.
 - 🤖 **Agent-aware** — when run by an AI coding agent, the installer suppresses prompts and emits a machine-readable JSON result ([details](docs/agent-integration.md)).

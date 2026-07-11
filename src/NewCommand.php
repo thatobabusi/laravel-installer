@@ -120,7 +120,7 @@ class NewCommand extends Command
             ->addOption('boost', null, InputOption::VALUE_NONE, 'Install Laravel Boost to improve AI assisted coding')
             ->addOption('no-boost', null, InputOption::VALUE_NONE, 'Skip Laravel Boost installation')
             ->addOption('using', null, InputOption::VALUE_OPTIONAL, 'Install a custom starter kit from a community maintained package')
-            ->addOption('ui', null, InputOption::VALUE_REQUIRED, 'Apply a UI preset to a vanilla application. Possible values are: bootstrap, coreui')
+            ->addOption('ui', null, InputOption::VALUE_REQUIRED, 'Apply a UI preset to a vanilla application. Possible values are: bootstrap, coreui, adminlte, laravel-adminlte, angular')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists');
     }
 

@@ -198,6 +198,18 @@
                         <div class="name">CoreUI 5</div>
                         <div class="desc">Open-source admin UI kit</div>
                     </div>
+                    <div class="opt" data-group="ui" data-value="adminlte">
+                        <div class="name">AdminLTE 4</div>
+                        <div class="desc">Bootstrap 5 admin dashboard</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="laravel-adminlte">
+                        <div class="name">Laravel AdminLTE</div>
+                        <div class="desc">jeroennoten/laravel-adminlte package</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="angular">
+                        <div class="name">Angular</div>
+                        <div class="desc">SPA scaffold in frontend/ via Angular CLI</div>
+                    </div>
                 </div>
             </div>
 
@@ -571,7 +583,8 @@
         } else {
             rows.push(['Stack', `${state.stack} (blank, no authentication)`]);
             if (state.stack === 'blade' && state.ui !== 'none') {
-                rows.push(['UI framework', state.ui === 'bootstrap' ? 'Bootstrap 5' : 'CoreUI 5']);
+                const uiLabels = { bootstrap: 'Bootstrap 5', coreui: 'CoreUI 5', adminlte: 'AdminLTE 4', 'laravel-adminlte': 'Laravel AdminLTE', angular: 'Angular (SPA in frontend/)' };
+                rows.push(['UI framework', uiLabels[state.ui] || state.ui]);
             }
         }
         rows.push(['Database', state.database]);

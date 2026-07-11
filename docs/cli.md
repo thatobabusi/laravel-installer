@@ -11,15 +11,24 @@ Creates a Laravel application. `--react`, `--svelte`, `--vue`, and `--livewire` 
 | Database | `--database=mysql|mariadb|pgsql|sqlite|sqlsrv` |
 | Tests | `--pest`, `--phpunit` |
 | Frontend | `--npm`, `--pnpm`, `--bun`, `--yarn`, `--no-node` |
-| UI preset (vanilla only) | `--ui=bootstrap|coreui` |
+| UI preset (vanilla only) | `--ui=bootstrap|coreui|adminlte|laravel-adminlte|angular` |
 | Authentication | `--workos`, `--teams`, `--livewire-class-components` |
 | AI tooling | `--boost`, `--no-boost` |
 | Git and GitHub | `--git`, `--branch`, `--github`, `--organization` |
 
-`--ui` applies a UI preset to a vanilla (no starter kit) application: it swaps the skeleton's
-Tailwind scaffolding for Bootstrap 5 or CoreUI 5 by updating `package.json`, the Vite entry
-points (`resources/css/app.css`, `resources/js/app.js`), and the Vite configuration. It is
-rejected when combined with a starter kit, since kits ship their own frontend stack.
+`--ui` applies a UI preset to a vanilla (no starter kit) application and is rejected when
+combined with a starter kit, since kits ship their own frontend stack. The presets come in
+three flavors:
+
+- **Vite swaps** (`bootstrap`, `coreui`, `adminlte`) replace the skeleton's Tailwind
+  scaffolding with the chosen framework by updating `package.json`, the Vite entry points
+  (`resources/css/app.css`, `resources/js/app.js`), and the Vite configuration.
+- **Composer package** (`laravel-adminlte`) requires
+  [jeroennoten/laravel-adminlte](https://github.com/jeroennoten/Laravel-AdminLTE) and runs
+  `php artisan adminlte:install`, leaving the Vite/Tailwind setup untouched.
+- **SPA scaffold** (`angular`) runs the Angular CLI (`npx @angular/cli new frontend`) inside
+  the application, producing a standalone Angular workspace in `frontend/` alongside the
+  Laravel backend. Requires Node and network access; the Laravel Vite setup is untouched.
 
 Do not mix mutually exclusive choices such as two package-manager flags or both test-framework flags. In automation, specify all choices and pass `--no-interaction`.
 

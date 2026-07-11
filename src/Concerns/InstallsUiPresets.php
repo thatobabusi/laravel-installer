@@ -3,17 +3,20 @@
 namespace Laravel\Installer\Console\Concerns;
 
 use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 
 trait InstallsUiPresets
 {
     /**
      * The available vanilla UI presets.
      *
-     * Each preset swaps the default Tailwind scaffolding for another CSS
-     * framework by editing package.json, the Vite entry points, and the
-     * Vite configuration of the freshly created application.
+     * Presets with "packages" swap the default Tailwind scaffolding for
+     * another CSS framework by editing package.json, the Vite entry points,
+     * and the Vite configuration. Presets with "commands" run installer
+     * commands (Composer packages, SPA scaffolds) inside the new application.
      */
     protected static array $uiPresets = [
         'bootstrap' => [
@@ -27,6 +30,25 @@ trait InstallsUiPresets
             'packages' => ['@coreui/coreui' => '^5.4', '@popperjs/core' => '^2.11'],
             'css' => "@import '@coreui/coreui/dist/css/coreui.min.css';\n",
             'js' => "import '@coreui/coreui';\n",
+        ],
+        'adminlte' => [
+            'label' => 'AdminLTE 4',
+            'packages' => ['admin-lte' => '^4.0', 'bootstrap' => '^5.3', '@popperjs/core' => '^2.11'],
+            'css' => "@import 'admin-lte/dist/css/adminlte.min.css';\n",
+            'js' => "import * as bootstrap from 'bootstrap';\nimport 'admin-lte/dist/js/adminlte.min.js';\n",
+        ],
+        'laravel-adminlte' => [
+            'label' => 'Laravel AdminLTE',
+            'commands' => [
+                '@composer require jeroennoten/laravel-adminlte',
+                '@php artisan adminlte:install',
+            ],
+        ],
+        'angular' => [
+            'label' => 'Angular',
+            'commands' => [
+                'npx --yes @angular/cli@latest new frontend --defaults --skip-git',
+            ],
         ],
     ];
 
@@ -63,9 +85,35 @@ trait InstallsUiPresets
     {
         $preset = static::$uiPresets[$input->getOption('ui')];
 
-        $this->swapNodeDependenciesForPreset($directory, $preset);
-        $this->writePresetEntryPoints($directory, $preset);
-        $this->removeTailwindVitePlugin($directory);
+        if (isset($preset['packages'])) {
+            $this->swapNodeDependenciesForPreset($directory, $preset);
+            $this->writePresetEntryPoints($directory, $preset);
+            $this->removeTailwindVitePlugin($directory);
+        }
+
+        if (! empty($preset['commands'])) {
+            $output->writeln("  Applying the {$preset['label']} UI preset...");
+
+            foreach ($preset['commands'] as $command) {
+                // Run preset commands verbatim — tools like the Angular CLI reject
+                // the --no-ansi / --quiet flags runCommands() appends...
+                $process = Process::fromShellCommandline(
+                    $this->normalizeInstallerHookCommand($command),
+                    $directory,
+                    null,
+                    null,
+                    null,
+                );
+
+                $process->run(function ($type, $line) use ($output) {
+                    $output->write('    '.$line);
+                });
+
+                if (! $process->isSuccessful()) {
+                    throw new RuntimeException("The {$preset['label']} UI preset failed to install. Command failed: {$command}");
+                }
+            }
+        }
 
         $output->writeln("  <fg=green>{$preset['label']} UI preset applied.</>");
 
