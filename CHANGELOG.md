@@ -1,6 +1,31 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/installer/compare/v5.30.0...master)
+## [Unreleased](https://github.com/thatobabusi/laravel-installer/compare/v5.31.0...master)
+
+## [v5.31.0](https://github.com/thatobabusi/laravel-installer/compare/v5.30.1...v5.31.0) - 2026-07-11
+
+### What's Changed
+
+* Vanilla UI presets: `laravel new --ui=bootstrap|coreui|adminlte|laravel-adminlte|angular` scaffolds blank Blade applications with Bootstrap 5, CoreUI 5, or AdminLTE 4 (Vite swaps), the jeroennoten/laravel-adminlte Composer package, or an Angular SPA workspace in `frontend/`
+* The web installer wizard offers the UI presets as a "UI framework" choice for Blank + Blade setups
+* Preset commands run verbatim so tools like the Angular CLI no longer receive the appended `--no-ansi` flag; failed preset commands abort the install with a clear error
+* README restyled as a fork-first package page with live badges and documentation links
+* Documentation source hashing normalizes line endings so `composer docs:check` agrees between Windows and CI checkouts
+* `src/Concerns/InstallsUiPresets.php` is tracked in the generated documentation source manifest
+
+**Full Changelog**: https://github.com/thatobabusi/laravel-installer/compare/v5.30.1...v5.31.0
+
+## [v5.30.1](https://github.com/thatobabusi/laravel-installer/compare/v5.30.0...v5.30.1) - 2026-07-11
+
+First release of the [thatobabusi/laravel-installer](https://github.com/thatobabusi/laravel-installer) fork.
+
+### What's Changed
+
+* `laravel web`: a browser-based installer wizard covering every `laravel new` option, with live name validation, PDO-aware database choices, an equivalent-CLI preview, and a streamed install log (loopback-only, with an optional Herd front controller in `public/`)
+* `docs/` documentation set: getting started, CLI guide, web installer, agent integration, upstream sync, and a generated command reference kept honest by `composer docs:update` / `docs:check` and CI
+* Repository automation: `docs-sync.yml` (scheduled reference regeneration), `upstream-sync.yml` (weekly laravel/installer merge — PR on clean merge, issue on conflict), and `release.yml` (one-click version bump, tag, and GitHub Release)
+
+**Full Changelog**: https://github.com/thatobabusi/laravel-installer/compare/v5.30.0...v5.30.1
 
 ## [v5.30.0](https://github.com/laravel/installer/compare/v5.29.0...v5.30.0) - 2026-07-02
 
