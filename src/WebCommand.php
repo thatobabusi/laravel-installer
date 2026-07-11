@@ -249,6 +249,8 @@ class WebCommand extends Command
         } else {
             if (in_array($stack, ['react', 'svelte', 'vue', 'livewire'], true)) {
                 $flags[] = '--'.$stack;
+            } elseif (in_array($job['ui'] ?? null, ['bootstrap', 'coreui'], true)) {
+                $flags[] = '--ui='.$job['ui'];
             }
 
             $flags[] = '--no-authentication';

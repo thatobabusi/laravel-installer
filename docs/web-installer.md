@@ -15,7 +15,7 @@ The command starts PHP's built-in server on `127.0.0.1`, selects an available po
 
 Link this repository in Herd with its document root set to public/. Start laravel web from the folder where new applications should be created, then open your Herd host (for example, https://laravel-installer.test). [public/index.php](../public/index.php) proxies that request to the active loopback-only installer process and rejects non-local requests. The public entry point returns a clear 503 message until laravel web is running.
 
-The UI collects application name, starter kit, authentication, database, tests, Node manager, Boost, Git, and GitHub preferences, then displays the equivalent `laravel new` command. Click **Close installer** or use `Ctrl+C` in the terminal to stop the server.
+The UI collects application name, starter kit, authentication, database, tests, Node manager, Boost, Git, and GitHub preferences, then displays the equivalent `laravel new` command. When the Blank setup with the Blade stack is selected, a **UI framework** choice appears: keep the default Tailwind skeleton, or apply the Bootstrap 5 / CoreUI 5 preset (`--ui=bootstrap|coreui`). Click **Close installer** or use `Ctrl+C` in the terminal to stop the server.
 
 ## Behavior and requirements
 

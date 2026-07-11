@@ -11,9 +11,15 @@ Creates a Laravel application. `--react`, `--svelte`, `--vue`, and `--livewire` 
 | Database | `--database=mysql|mariadb|pgsql|sqlite|sqlsrv` |
 | Tests | `--pest`, `--phpunit` |
 | Frontend | `--npm`, `--pnpm`, `--bun`, `--yarn`, `--no-node` |
+| UI preset (vanilla only) | `--ui=bootstrap|coreui` |
 | Authentication | `--workos`, `--teams`, `--livewire-class-components` |
 | AI tooling | `--boost`, `--no-boost` |
 | Git and GitHub | `--git`, `--branch`, `--github`, `--organization` |
+
+`--ui` applies a UI preset to a vanilla (no starter kit) application: it swaps the skeleton's
+Tailwind scaffolding for Bootstrap 5 or CoreUI 5 by updating `package.json`, the Vite entry
+points (`resources/css/app.css`, `resources/js/app.js`), and the Vite configuration. It is
+rejected when combined with a starter kit, since kits ship their own frontend stack.
 
 Do not mix mutually exclusive choices such as two package-manager flags or both test-framework flags. In automation, specify all choices and pass `--no-interaction`.
 

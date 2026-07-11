@@ -183,6 +183,24 @@
                 <div class="options" id="stackOptions"></div>
             </div>
 
+            <div class="field hidden" id="uiField">
+                <label class="title">UI framework</label>
+                <div class="options">
+                    <div class="opt" data-group="ui" data-value="none">
+                        <div class="name">Tailwind</div>
+                        <div class="desc">Default skeleton styling</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="bootstrap">
+                        <div class="name">Bootstrap 5</div>
+                        <div class="desc">Swaps Tailwind for Bootstrap</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="coreui">
+                        <div class="name">CoreUI 5</div>
+                        <div class="desc">Open-source admin UI kit</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="field hidden" id="authField">
                 <label class="title">Authentication provider</label>
                 <div class="options wide">
@@ -333,6 +351,7 @@
         nameValid: false,
         starterKit: 'yes',
         stack: 'react',
+        ui: 'none',
         using: '',
         auth: 'laravel',
         singleFile: true,
@@ -425,6 +444,7 @@
         $$('[data-toggle]').forEach(t => t.classList.toggle('on', !!state[t.dataset.toggle]));
 
         const kit = state.starterKit === 'yes' && !state.using;
+        $('#uiField').classList.toggle('hidden', !(state.starterKit === 'no' && state.stack === 'blade' && !state.using));
         $('#authField').classList.toggle('hidden', !kit);
         $('#livewireSingleFile').classList.toggle('hidden', !(kit && state.stack === 'livewire' && state.auth === 'laravel'));
         $('#teamsToggle').classList.toggle('hidden', !(kit && (state.stack !== 'livewire' || state.auth === 'workos' || state.singleFile)));
@@ -494,6 +514,7 @@
             name: state.name,
             starterKit: state.starterKit === 'yes',
             stack: state.stack,
+            ui: state.ui,
             using: state.using || null,
             auth: state.auth,
             livewireClassComponents: !state.singleFile,
@@ -519,6 +540,7 @@
             if (state.teams) parts.push('--teams');
         } else {
             if (state.stack !== 'blade') parts.push(`--${state.stack}`);
+            else if (state.ui !== 'none') parts.push(`--ui=${state.ui}`);
             parts.push('--no-authentication');
         }
         parts.push(`--database=${state.database}`);
@@ -548,6 +570,9 @@
             if (state.teams) rows.push(['Teams', 'Enabled']);
         } else {
             rows.push(['Stack', `${state.stack} (blank, no authentication)`]);
+            if (state.stack === 'blade' && state.ui !== 'none') {
+                rows.push(['UI framework', state.ui === 'bootstrap' ? 'Bootstrap 5' : 'CoreUI 5']);
+            }
         }
         rows.push(['Database', state.database]);
         rows.push(['Testing', state.testing === 'phpunit' ? 'PHPUnit' : 'Pest']);

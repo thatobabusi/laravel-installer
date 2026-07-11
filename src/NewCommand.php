@@ -34,6 +34,7 @@ use function Laravel\Prompts\text;
 class NewCommand extends Command
 {
     use Concerns\ConfiguresPrompts;
+    use Concerns\InstallsUiPresets;
     use Concerns\InteractsWithHerdOrValet;
 
     const DATABASE_DRIVERS = ['mysql', 'mariadb', 'pgsql', 'sqlite', 'sqlsrv'];
@@ -119,6 +120,7 @@ class NewCommand extends Command
             ->addOption('boost', null, InputOption::VALUE_NONE, 'Install Laravel Boost to improve AI assisted coding')
             ->addOption('no-boost', null, InputOption::VALUE_NONE, 'Skip Laravel Boost installation')
             ->addOption('using', null, InputOption::VALUE_OPTIONAL, 'Install a custom starter kit from a community maintained package')
+            ->addOption('ui', null, InputOption::VALUE_REQUIRED, 'Apply a UI preset to a vanilla application. Possible values are: bootstrap, coreui')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists');
     }
 
@@ -554,6 +556,7 @@ class NewCommand extends Command
         $this->pingNewInstallUrl();
 
         $this->validateDatabaseOption($input);
+        $this->validateUiOption($input);
 
         $name = rtrim($input->getArgument('name'), '/\\');
 
@@ -683,6 +686,10 @@ class NewCommand extends Command
 
             if ($input->getOption('pest')) {
                 $this->installPest($directory, $input, $output);
+            }
+
+            if ($input->getOption('ui') && ! $this->usingStarterKit($input)) {
+                $this->installUiPreset($directory, $input, $output);
             }
 
             if ($input->getOption('github') !== false) {

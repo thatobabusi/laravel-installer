@@ -19,7 +19,8 @@ $manifest = [];
 foreach ($sources as $source) {
     $path = $root.DIRECTORY_SEPARATOR.$source;
     if (! file_exists($path)) { fwrite(STDERR, "Missing documentation source: {$source}\n"); exit(1); }
-    $manifest[$source] = hash_file('sha256', $path);
+    // Normalize line endings so Windows (CRLF) and CI (LF) checkouts produce identical hashes...
+    $manifest[$source] = hash('sha256', str_replace("\r\n", "\n", (string) file_get_contents($path)));
 }
 $files = ['docs/reference/command-help.md' => implode(PHP_EOL, $lines).PHP_EOL, 'docs/reference/source-manifest.json' => json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL];
 $stale = [];

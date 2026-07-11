@@ -41,6 +41,7 @@ Options:
       --boost                      Install Laravel Boost to improve AI assisted coding
       --no-boost                   Skip Laravel Boost installation
       --using[=USING]              Install a custom starter kit from a community maintained package
+      --ui=UI                      Apply a UI preset to a vanilla application. Possible values are: bootstrap, coreui
   -f, --force                      Forces install even if the directory already exists
   -h, --help                       Display help for the given command. When no command is given display help for the list command
       --silent                     Do not output any message
