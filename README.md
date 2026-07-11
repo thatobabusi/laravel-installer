@@ -130,7 +130,8 @@ See [Getting started](docs/getting-started.md) for recipes and the
 
 | Workflow | What it does |
 | --- | --- |
-| `tests.yml` / `static-analysis.yml` | PHP/Laravel compatibility matrix and PHPStan on every push and PR |
+| `tests.yml` / `static-analysis.yml` | PHPUnit (unit + feature) matrix and PHPStan on every push and PR |
+| `e2e.yml` | Playwright end-to-end tests against the live `laravel web` wizard |
 | `docs.yml` | Fails CI when generated documentation is stale |
 | `docs-sync.yml` | Regenerates the command reference on schedule and commits the drift |
 | `upstream-sync.yml` | Merges `laravel/installer` weekly — PR on a clean merge, issue on conflict |

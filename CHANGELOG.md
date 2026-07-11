@@ -1,6 +1,18 @@
 # Release Notes
 
-## [Unreleased](https://github.com/thatobabusi/laravel-installer/compare/v5.31.1...master)
+## [Unreleased](https://github.com/thatobabusi/laravel-installer/compare/v5.32.0...master)
+
+## [v5.32.0](https://github.com/thatobabusi/laravel-installer/compare/v5.31.1...v5.32.0) - 2026-07-12
+
+### What's Changed
+
+* Playwright end-to-end tests (`tests/E2E/`) drive the real `laravel web` wizard in Chromium: step navigation, conditional fields, UI preset cards, the CLI preview, HTTP API contracts, and an opt-in full-installation run (`E2E_INSTALL=1`)
+* Backend unit tests (`tests/Unit/`) cover the wizard job-to-flag mapping with its validation and agent-environment scrubbing, plus UI preset validation, Tailwind-swap mechanics, and command-preset execution including failure handling
+* Backend feature tests (`tests/Feature/`) boot the installer's HTTP router on PHP's built-in server and exercise every endpoint, including log streaming with ANSI stripping, job queueing, and the concurrent-install guard
+* New `e2e.yml` workflow runs the Playwright suite on every push and pull request
+* Herd on Windows: repointing Herd's bundled `laravel` shim at this fork is documented in Getting started
+
+**Full Changelog**: https://github.com/thatobabusi/laravel-installer/compare/v5.31.1...v5.32.0
 
 ## [v5.31.1](https://github.com/thatobabusi/laravel-installer/compare/v5.31.0...v5.31.1) - 2026-07-11
 
