@@ -1,6 +1,15 @@
 # Release Notes
 
-## [Unreleased](https://github.com/thatobabusi/laravel-installer/compare/v5.31.0...master)
+## [Unreleased](https://github.com/thatobabusi/laravel-installer/compare/v5.31.1...master)
+
+## [v5.31.1](https://github.com/thatobabusi/laravel-installer/compare/v5.31.0...v5.31.1) - 2026-07-11
+
+### What's Changed
+
+* The web installer removes its `public/.web-installer.json` gateway file when it stops, so a Herd-linked host reports "installer is not running" instead of proxying to a dead port
+* Generated-documentation staleness comparison normalizes line endings, fixing false "stale" reports on autocrlf (Windows) checkouts
+
+**Full Changelog**: https://github.com/thatobabusi/laravel-installer/compare/v5.31.0...v5.31.1
 
 ## [v5.31.0](https://github.com/thatobabusi/laravel-installer/compare/v5.30.1...v5.31.0) - 2026-07-11
 
