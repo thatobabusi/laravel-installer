@@ -1,8 +1,8 @@
 {
-    "bin/laravel": "01869bf56ac04fdf9bd52d2be5359793c976f72e14d08af651804fb8ec3dc294",
-    "src/NewCommand.php": "64431144b28bf310828da3afab59c38138956f5723d33c63f3f74f705bff4f37",
-    "src/PackageCommand.php": "6c8c7c5470f9646c013bc8160d505f2c4e9c28b2a2add5bc34deee49660e7733",
+    "bin/laravel": "58d872158bca0e243b6b440be5504a200250ec51ac0a88a25460995707582863",
+    "src/NewCommand.php": "2952e5f0765a29b884fe2784fd2557d2d10e52ccab73b7a98137cb4ae2e8f313",
+    "src/PackageCommand.php": "6a6e8d9b82ec045cd8174e447a698bf72bc495219b3752ccdaed9411df33979e",
     "src/WebCommand.php": "048cc9d1cdb58e1140ee1d287a967b3e4da7fa856b02ea2709797adae491bfb8",
     "src/Web/router.php": "19e716aa9eb9df7d2a5adb44cb062ff3b7b4333a52fa7d5992d4af021b5da6df",
-    "src/Agent.php": "19a1676643c2589f5138f0063099ee86337c4c4307c0107c14c8eb5af2d16e9c"
+    "src/Agent.php": "dd64f6a40ea8b9cb67171c21f76ca33b5f9b24183a126f99e3e82deb843e62c2"
 }
