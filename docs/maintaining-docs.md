@@ -19,3 +19,15 @@ After changing `bin/laravel`, a command class, or agent output:
    ```
 
 `docs:check` compares checked-in command help and SHA-256 hashes for installer command sources against the current checkout. CI fails when a command contract changes without regenerating documentation. Add a source path to `scripts/sync-docs.php` whenever it can alter a documented public contract.
+
+## End-to-end tests
+
+`tests/E2E/` holds Playwright tests that boot the real `laravel web` server and drive the wizard in Chromium — step navigation, conditional fields, the CLI preview, and the HTTP API. They run in CI on every push (`e2e.yml`). Locally:
+
+```sh
+npm install && npx playwright install chromium   # once
+npm run test:e2e                                 # the suite
+npm run test:e2e:install                         # + the full Composer installation test
+```
+
+The full-install test is skipped unless `E2E_INSTALL=1`; it creates (and removes) a real application in the repository root, and needs a PHP new enough for the current Laravel skeleton on your `PATH`.

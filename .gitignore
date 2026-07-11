@@ -6,3 +6,8 @@ phpunit.xml
 
 /public/.web-installer.json
 /public/.web-installer.json.tmp
+
+/node_modules
+/playwright-report
+/test-results
+/e2e-install-*

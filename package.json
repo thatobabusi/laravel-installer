@@ -1,0 +1,14 @@
+{
+    "name": "laravel-installer-e2e",
+    "private": true,
+    "description": "End-to-end tests for the Laravel installer web UI.",
+    "scripts": {
+        "test:e2e": "playwright test",
+        "test:e2e:headed": "playwright test --headed",
+        "test:e2e:install": "cross-env E2E_INSTALL=1 playwright test"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.49.0",
+        "cross-env": "^7.0.3"
+    }
+}
