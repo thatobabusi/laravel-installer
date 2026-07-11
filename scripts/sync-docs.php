@@ -24,9 +24,11 @@ foreach ($sources as $source) {
 }
 $files = ['docs/reference/command-help.md' => implode(PHP_EOL, $lines).PHP_EOL, 'docs/reference/source-manifest.json' => json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL];
 $stale = [];
+// Compare with normalized line endings so autocrlf checkouts don't read as drift...
+$normalize = fn (string $contents): string => str_replace("\r\n", "\n", $contents);
 foreach ($files as $file => $contents) {
     $path = $root.DIRECTORY_SEPARATOR.$file;
-    if (! file_exists($path) || file_get_contents($path) !== $contents) { $stale[] = $file; if (! $check) { is_dir(dirname($path)) || mkdir(dirname($path), 0777, true); file_put_contents($path, $contents); } }
+    if (! file_exists($path) || $normalize((string) file_get_contents($path)) !== $normalize($contents)) { $stale[] = $file; if (! $check) { is_dir(dirname($path)) || mkdir(dirname($path), 0777, true); file_put_contents($path, $contents); } }
 }
 if ($check && $stale !== []) { fwrite(STDERR, "Generated documentation is stale:\n - ".implode("\n - ", $stale)."\nRun composer docs:update.\n"); exit(1); }
 echo $stale === [] ? "Documentation is up to date.\n" : "Documentation updated:\n - ".implode("\n - ", $stale)."\n";
