@@ -11,6 +11,20 @@ laravel --version
 
 Ensure Composer's global `vendor/bin` folder is on your `PATH`. The installer requires PHP 8.2+. Composer is required to create applications. Git, a Node package manager, and the GitHub CLI are optional and used only when their related features are selected.
 
+> **Running this fork as your `laravel` command (Laravel Herd on Windows):** Herd ships its own
+> `laravel` shim (`%USERPROFILE%\.config\herd\bin\laravel.bat`) that runs a bundled phar and sits
+> first on `PATH`, shadowing other installs. To use this fork everywhere, back that file up and
+> repoint it at this repository:
+>
+> ```bat
+> @ECHO OFF
+> php "C:\path\to\laravel-installer\bin\laravel" %*
+> ```
+>
+> The bare `php` resolves through Herd's own shim to a current PHP (8.4+), which Laravel 13
+> application skeletons require. Note that a Herd update may restore the original shim — if
+> `laravel web` ever reports an unknown command again, re-apply this edit.
+
 ## Create an application
 
 Run the command from the folder that should contain the project:
