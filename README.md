@@ -5,6 +5,18 @@
 <a href="https://packagist.org/packages/laravel/installer"><img src="https://img.shields.io/packagist/v/laravel/installer" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/laravel/installer"><img src="https://img.shields.io/packagist/l/laravel/installer" alt="License"></a>
 
+> **Fork notice** — this is [thatobabusi/laravel-installer](https://github.com/thatobabusi/laravel-installer), a fork of
+> [laravel/installer](https://github.com/laravel/installer) that adds a browser-based installer:
+>
+> ```sh
+> laravel web
+> ```
+>
+> It serves a local wizard UI, walks through every `laravel new` option, and streams the install
+> log to the browser. Full documentation for this fork lives in [docs/](docs/README.md) —
+> start with [Getting started](docs/getting-started.md) and the [Web installer guide](docs/web-installer.md).
+> Upstream changes are pulled in on a schedule; see [Upstream sync](docs/upstream-sync.md).
+
 ## Official Documentation
 
 Documentation for installing Laravel can be found on the [Laravel website](https://laravel.com/docs#creating-a-laravel-project).

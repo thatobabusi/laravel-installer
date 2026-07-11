@@ -9,6 +9,7 @@ This folder documents the executable in this repository. It covers installer-spe
 - [Web installer](web-installer.md)
 - [Agent integration](agent-integration.md)
 - [Maintaining documentation](maintaining-docs.md)
+- [Upstream sync](upstream-sync.md)
 - [Generated command reference](reference/command-help.md)
 
 The generated reference is intentionally committed. It gives users the exact options and defaults supported by the version of the installer they have checked out.

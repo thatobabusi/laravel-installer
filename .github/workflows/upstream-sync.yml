@@ -1,0 +1,76 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/laravel/installer.git
+          git fetch upstream master
+
+      - name: Check for upstream changes
+        id: changes
+        run: |
+          BEHIND=$(git rev-list --count HEAD..upstream/master)
+          echo "behind=$BEHIND" >> "$GITHUB_OUTPUT"
+          echo "Fork is $BEHIND commit(s) behind upstream/master."
+
+      - name: Attempt merge
+        id: merge
+        if: steps.changes.outputs.behind != '0'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B upstream-sync
+          if git merge upstream/master --no-edit; then
+            echo "conflict=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+            git merge --abort
+          fi
+
+      - name: Open sync pull request
+        if: steps.changes.outputs.behind != '0' && steps.merge.outputs.conflict == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git push --force origin upstream-sync
+          if ! gh pr list --head upstream-sync --state open --json number --jq 'length' | grep -qx 0; then
+            echo "An upstream-sync pull request is already open; branch updated."
+            exit 0
+          fi
+          gh pr create \
+            --head upstream-sync \
+            --base master \
+            --title "Sync with laravel/installer (${{ steps.changes.outputs.behind }} commits)" \
+            --body "Automated weekly merge of [laravel/installer](https://github.com/laravel/installer) \`master\` into this fork. Review the diff — CI runs tests, static analysis, and \`composer docs:check\` against the merge. If command help changed upstream, run \`composer docs:update\` on this branch before merging."
+
+      - name: Open conflict issue
+        if: steps.changes.outputs.behind != '0' && steps.merge.outputs.conflict == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh issue list --state open --search "in:title Upstream sync conflict" --json number --jq 'length' | grep -qx 0; then
+            echo "A conflict issue is already open."
+            exit 0
+          fi
+          gh issue create \
+            --title "Upstream sync conflict with laravel/installer" \
+            --body "The weekly upstream merge hit conflicts and needs a manual resolve. Locally run: \`git fetch upstream && git merge upstream/master\`, resolve the conflicts (our customizations live in \`src/WebCommand.php\`, \`src/Web/\`, \`public/\`, \`docs/\`, \`scripts/\`, and the command registrations in \`bin/laravel\`), then run \`composer docs:update && composer docs:check\` and push."
