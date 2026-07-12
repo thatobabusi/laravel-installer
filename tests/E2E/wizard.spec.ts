@@ -53,6 +53,8 @@ test.describe('stack step conditionals', () => {
         await page.goto('/');
         await fillValidName(page, uniqueName('pw-wizard'));
         await page.click('#nameNext');
+        // Past the project-type step (Web application default)...
+        await visibleStep(page).locator('[data-nav="next"]').click();
     });
 
     test('starter kits show auth options and hide UI presets', async ({ page }) => {
@@ -63,15 +65,21 @@ test.describe('stack step conditionals', () => {
         await expect(page.locator('.opt[data-group="stack"][data-value="blade"]')).toHaveCount(0);
     });
 
-    test('blank blade setups offer the UI framework presets', async ({ page }) => {
+    test('blank blade setups offer the frontend extras step', async ({ page }) => {
         await page.click('.opt[data-group="starterKit"][data-value="no"]');
         await page.click('.opt[data-group="stack"][data-value="blade"]');
-
-        await expect(page.locator('#uiField')).toBeVisible();
         await expect(page.locator('#authField')).toBeHidden();
 
+        await visibleStep(page).locator('[data-nav="next"]').click();
+
+        await expect(page.locator('#uiField')).toBeVisible();
+        await expect(page.locator('#jsField')).toBeVisible();
+
         const presets = page.locator('#uiField .opt .name');
-        await expect(presets).toHaveText(['Tailwind', 'Bootstrap 5', 'CoreUI 5', 'AdminLTE 4', 'Laravel AdminLTE']);
+        await expect(presets).toHaveText(['Tailwind', 'Bootstrap 5', 'Bulma', 'UIkit', 'Pico CSS', 'CoreUI 5', 'AdminLTE 4', 'Laravel AdminLTE']);
+
+        const enhancements = page.locator('#jsField .opt .name');
+        await expect(enhancements).toHaveText(['None', 'Alpine.js', 'HTMX', 'jQuery', 'Stimulus']);
     });
 
     test('blank setups offer the SPA stacks and hide UI presets for them', async ({ page }) => {
@@ -98,28 +106,65 @@ test.describe('stack step conditionals', () => {
 test.describe('review step', () => {
     test('builds the equivalent CLI command for a preset install', async ({ page }) => {
         const name = uniqueName('pw-review');
+        const next = () => visibleStep(page).locator('[data-nav="next"]').click();
 
         await page.goto('/');
         await fillValidName(page, name);
         await page.click('#nameNext');
+        await next(); // project type: web application
 
         await page.click('.opt[data-group="starterKit"][data-value="no"]');
         await page.click('.opt[data-group="stack"][data-value="blade"]');
+        await next(); // frontend extras
+
         await page.click('.opt[data-group="ui"][data-value="bootstrap"]');
-        await visibleStep(page).locator('[data-nav="next"]').click();
+        await page.click('.opt[data-group="js"][data-value="alpine"]');
+        await next(); // options
 
         await page.click('.opt[data-group="node"][data-value="skip"]');
-        await visibleStep(page).locator('[data-nav="next"]').click();
-        await visibleStep(page).locator('[data-nav="next"]').click();
+        await next(); // git
+        await next(); // review
 
         const cli = page.locator('#cliPreview');
         await expect(cli).toContainText(`laravel new ${name}`);
         await expect(cli).toContainText('--ui=bootstrap');
+        await expect(cli).toContainText('--js=alpine');
+        await expect(cli).toContainText('--theme');
         await expect(cli).toContainText('--no-authentication');
         await expect(cli).toContainText('--no-node');
         await expect(cli).toContainText('--no-interaction');
 
         await expect(page.locator('#summaryTable')).toContainText('Bootstrap 5');
+        await expect(page.locator('#summaryTable')).toContainText('Alpine.js');
+    });
+
+    test('api project type skips the stack steps and can skip to review', async ({ page }) => {
+        const name = uniqueName('pw-api');
+
+        await page.goto('/');
+        await fillValidName(page, name);
+        await page.click('#nameNext');
+
+        await page.click('.opt[data-group="type"][data-value="api"]');
+        await visibleStep(page).locator('[data-skip]').click();
+
+        const cli = page.locator('#cliPreview');
+        await expect(cli).toContainText('--type=api');
+        await expect(cli).toContainText('--no-authentication');
+        await expect(page.locator('#summaryTable')).toContainText('API only');
+    });
+
+    test('package project type produces a laravel package command', async ({ page }) => {
+        const name = uniqueName('pw-pkg');
+
+        await page.goto('/');
+        await fillValidName(page, name);
+        await page.click('#nameNext');
+
+        await page.click('.opt[data-group="type"][data-value="package"]');
+        await visibleStep(page).locator('[data-nav="next"]').click();
+
+        await expect(page.locator('#cliPreview')).toContainText(`laravel package ${name}`);
     });
 });
 

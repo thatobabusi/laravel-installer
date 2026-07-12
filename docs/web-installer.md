@@ -21,33 +21,41 @@ The command starts PHP's built-in server on `127.0.0.1`, selects an available po
 
 Link this repository in Herd with its document root set to public/. Start laravel web from the folder where new applications should be created, then open your Herd host (for example, https://laravel-installer.test). [public/index.php](../public/index.php) proxies that request to the active loopback-only installer process and rejects non-local requests. The public entry point returns a clear 503 message until laravel web is running.
 
-The UI collects application name, starter kit, authentication, database, tests, Node manager, Boost, Git, and GitHub preferences, then displays the equivalent `laravel new` command. Click **Close installer** or use `Ctrl+C` in the terminal to stop the server.
+The wizard walks through project type, stack, frontend extras, options, and version control, then displays the equivalent `laravel new` command. Every step after the name has a **Skip to review** shortcut, and steps that don't apply to your choices are skipped automatically. Click **Close installer** or use `Ctrl+C` in the terminal to stop the server.
 
 ## The wizard, step by step
 
-Choose an official starter kit with authentication scaffolding, or start blank:
+Name the project — and optionally create it in a different directory than the one `laravel web` was started from:
 
-![Stack step with the official starter kits](images/02-starter-kits.png)
+![Project step with live name validation](images/01-project.png)
 
-The Blank setup's stack row also offers modern SPA frontends — Angular, Next.js, Nuxt, SvelteKit, and Astro — each scaffolded in `frontend/` alongside the Laravel backend (`--spa=angular|next|nuxt|sveltekit|astro`). When the Blade stack is selected, a **UI framework** choice appears: keep the default Tailwind skeleton, or apply a preset — Bootstrap 5, CoreUI 5, AdminLTE 4, or the Laravel AdminLTE Composer package (`--ui=bootstrap|coreui|adminlte|laravel-adminlte`):
+Pick a project type. **Web application** unlocks the full stack steps; **API only** runs `install:api` (Sanctum); **Dashboard** installs a Filament panel; **Package** scaffolds via `laravel package`:
 
-![Blank Blade setup offering the UI framework presets](images/03-ui-presets.png)
+![Project type step](images/02-project-type.png)
+
+For web applications, choose an official starter kit or a blank stack — including SPA frontends (Angular, Next.js, Nuxt, SvelteKit, Astro) scaffolded in `frontend/` alongside the Laravel backend:
+
+![Frontend stack grid for blank setups](images/03-stacks.png)
+
+Blank Blade setups get a **Frontend extras** step: a UI framework (Tailwind default, Bootstrap 5, Bulma, UIkit, Pico CSS, CoreUI 5, AdminLTE 4, Laravel AdminLTE), a JavaScript enhancement (Alpine.js, HTMX, jQuery, Stimulus), and the light/dark theme helper, which is on by default:
+
+![Frontend extras: UI framework, JavaScript, and theme helper](images/04-frontend-extras.png)
 
 Database, testing, Node, and Boost options follow — database drivers whose PDO extension is missing are disabled:
 
-![Application options step](images/04-options.png)
+![Application options step](images/05-options.png)
 
 Optionally initialize Git or publish straight to GitHub:
 
-![Version control step](images/05-version-control.png)
+![Version control step](images/06-version-control.png)
 
 The review step shows everything the installer is about to do, including the exact equivalent CLI command:
 
-![Review step with the equivalent CLI command](images/06-review.png)
+![Review step with the equivalent CLI command](images/07-review.png)
 
 The install log streams live into the browser, ending with the application URL and next steps:
 
-![Success screen with next steps](images/07-success.png)
+![Success screen with next steps](images/08-success.png)
 
 ## Behavior and requirements
 

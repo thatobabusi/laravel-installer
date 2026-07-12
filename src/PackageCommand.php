@@ -281,7 +281,9 @@ class PackageCommand extends Command
         if (! $output->isDecorated()) {
             $commands = array_map(
                 fn ($values) => array_map(function ($value) {
-                    if (Str::startsWith($value, ['chmod', 'rm', 'git'])) {
+                    // configure.php rejects unknown options, and appending to a
+                    // parenthesized Windows command is a cmd syntax error...
+                    if (Str::startsWith($value, ['chmod', 'rm', 'git', '(']) || str_contains($value, 'configure.php')) {
                         return $value;
                     }
 
@@ -294,7 +296,7 @@ class PackageCommand extends Command
         if ($input->getOption('quiet')) {
             $commands = array_map(
                 fn ($values) => array_map(function ($value) {
-                    if (Str::startsWith($value, ['chmod', 'rm', 'git'])) {
+                    if (Str::startsWith($value, ['chmod', 'rm', 'git', '(']) || str_contains($value, 'configure.php')) {
                         return $value;
                     }
 

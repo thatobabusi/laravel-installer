@@ -148,7 +148,20 @@ class WebCommand extends Command
             return;
         }
 
-        $directory = join_paths($this->targetDirectory, $name);
+        $workingDirectory = $this->targetDirectory;
+        $location = $job['location'] ?? null;
+
+        if (is_string($location) && $location !== '') {
+            if (! is_dir($location)) {
+                $this->writeStatus(['state' => 'failed', 'name' => $name, 'error' => 'The target location does not exist.']);
+
+                return;
+            }
+
+            $workingDirectory = $location;
+        }
+
+        $directory = join_paths($workingDirectory, $name);
 
         if (is_dir($directory) || is_file($directory)) {
             $this->writeStatus(['state' => 'failed', 'name' => $name, 'error' => 'Application already exists.']);
@@ -164,12 +177,14 @@ class WebCommand extends Command
             return;
         }
 
+        $console = ($job['type'] ?? null) === 'package' ? 'package' : 'new';
+
         $command = [
             $this->phpBinary(),
             $this->installerBinary(),
-            'new',
+            $console,
             $name,
-            ...$flags,
+            ...($console === 'package' ? [] : $flags),
             '--no-interaction',
             '--no-ansi',
         ];
@@ -183,7 +198,7 @@ class WebCommand extends Command
 
         $output->writeln("  Creating application <options=bold>{$name}</>...");
 
-        $this->installProcess = new Process($command, $this->targetDirectory, $this->cleanEnvironment(), null, null);
+        $this->installProcess = new Process($command, $workingDirectory, $this->cleanEnvironment(), null, null);
         $this->installProcess->setTimeout(null);
         $this->activeInstall = compact('name', 'directory');
         $this->installProcess->start(function ($type, $line) use ($logPath) {
@@ -255,8 +270,20 @@ class WebCommand extends Command
                 $flags[] = '--'.$stack;
             } elseif (in_array($stack, ['angular', 'next', 'nuxt', 'sveltekit', 'astro'], true)) {
                 $flags[] = '--spa='.$stack;
-            } elseif (in_array($job['ui'] ?? null, ['bootstrap', 'coreui', 'adminlte', 'laravel-adminlte'], true)) {
+            } elseif (in_array($job['ui'] ?? null, ['bootstrap', 'coreui', 'adminlte', 'laravel-adminlte', 'bulma', 'uikit', 'pico'], true)) {
                 $flags[] = '--ui='.$job['ui'];
+            }
+
+            if ($stack === 'blade' && in_array($job['js'] ?? null, ['alpine', 'htmx', 'jquery', 'stimulus'], true)) {
+                $flags[] = '--js='.$job['js'];
+            }
+
+            if ($stack === 'blade' && ! empty($job['theme'])) {
+                $flags[] = '--theme';
+            }
+
+            if (in_array($job['type'] ?? null, ['api', 'dashboard'], true)) {
+                $flags[] = '--type='.$job['type'];
             }
 
             $flags[] = '--no-authentication';

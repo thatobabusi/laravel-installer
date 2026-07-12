@@ -122,6 +122,9 @@ class NewCommand extends Command
             ->addOption('using', null, InputOption::VALUE_OPTIONAL, 'Install a custom starter kit from a community maintained package')
             ->addOption('ui', null, InputOption::VALUE_REQUIRED, 'Apply a UI preset to a vanilla application. Possible values are: bootstrap, coreui, adminlte, laravel-adminlte')
             ->addOption('spa', null, InputOption::VALUE_REQUIRED, 'Scaffold an SPA frontend in frontend/ alongside the application. Possible values are: angular, next, nuxt, sveltekit, astro')
+            ->addOption('js', null, InputOption::VALUE_REQUIRED, 'Add a JavaScript enhancement to a vanilla application. Possible values are: alpine, htmx, jquery, stimulus')
+            ->addOption('type', null, InputOption::VALUE_REQUIRED, 'The project type. Possible values are: web, api, dashboard')
+            ->addOption('theme', null, InputOption::VALUE_NONE, 'Include a light/dark theme toggle helper (window.toggleTheme)')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists');
     }
 
@@ -559,6 +562,8 @@ class NewCommand extends Command
         $this->validateDatabaseOption($input);
         $this->validateUiOption($input);
         $this->validateSpaOption($input);
+        $this->validateJsOption($input);
+        $this->validateTypeOption($input);
 
         $name = rtrim($input->getArgument('name'), '/\\');
 
@@ -694,8 +699,20 @@ class NewCommand extends Command
                 $this->installUiPreset($directory, $input, $output);
             }
 
+            if ($input->getOption('js') && ! $this->usingStarterKit($input)) {
+                $this->installJsEnhancement($directory, $input, $output);
+            }
+
+            if ($input->getOption('theme') && ! $this->usingStarterKit($input)) {
+                $this->installThemeToggle($directory, $input, $output);
+            }
+
             if ($input->getOption('spa') && ! $this->usingStarterKit($input)) {
                 $this->installSpaScaffold($directory, $input, $output);
+            }
+
+            if ($input->getOption('type') && ! $this->usingStarterKit($input)) {
+                $this->installProjectType($directory, $input, $output);
             }
 
             if ($input->getOption('github') !== false) {
@@ -1527,7 +1544,8 @@ class NewCommand extends Command
         if (! $output->isDecorated()) {
             $commands = array_map(
                 fn ($values) => array_map(function ($value) {
-                    if (Str::startsWith($value, ['chmod', 'rm', 'git', $this->phpBinary().' ./vendor/bin/pest'])) {
+                    // Appending to a parenthesized Windows command is a cmd syntax error...
+                    if (Str::startsWith($value, ['chmod', 'rm', 'git', '(', $this->phpBinary().' ./vendor/bin/pest'])) {
                         return $value;
                     }
 
@@ -1540,7 +1558,7 @@ class NewCommand extends Command
         if ($input->getOption('quiet')) {
             $commands = array_map(
                 fn ($values) => array_map(function ($value) {
-                    if (Str::startsWith($value, ['chmod', 'rm', 'git', $this->phpBinary().' ./vendor/bin/pest'])) {
+                    if (Str::startsWith($value, ['chmod', 'rm', 'git', '(', $this->phpBinary().' ./vendor/bin/pest'])) {
                         return $value;
                     }
 

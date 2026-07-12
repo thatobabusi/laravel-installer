@@ -49,14 +49,16 @@ laravel web               # the same wizard, in your browser
 ```
 
 <div align="center">
-<img src="docs/images/03-ui-presets.png" alt="The laravel web wizard offering starter kits and UI framework presets" width="720" />
+<img src="docs/images/03-stacks.png" alt="The laravel web wizard's frontend stack step" width="720" />
 </div>
 
 <h2 align="center">✨ Features</h2>
 
 - 🚀 **Everything upstream** — starter kits (React, Svelte, Vue, Livewire), WorkOS auth, teams, database setup, Pest/PHPUnit, npm/pnpm/bun/yarn, Laravel Boost, Git and GitHub publishing.
-- 🎨 **Vanilla UI presets** — scaffold blank applications with **Bootstrap 5**, **CoreUI 5**, **AdminLTE 4**, or the **Laravel AdminLTE** package via `--ui=...`, in the CLI and the web wizard.
+- 🧭 **Project types** — full web app, **API-only** (Sanctum via `install:api`), **Filament dashboard**, or a package skeleton via `--type=...`.
+- 🎨 **Vanilla UI presets** — scaffold blank applications with **Bootstrap 5**, **Bulma**, **UIkit**, **Pico CSS**, **CoreUI 5**, **AdminLTE 4**, or the **Laravel AdminLTE** package via `--ui=...`.
 - ⚡ **SPA frontends** — pair the Laravel backend with **Angular**, **Next.js**, **Nuxt**, **SvelteKit**, or **Astro**, scaffolded in `frontend/` via `--spa=...`.
+- 🧩 **JS enhancements & theming** — add **Alpine.js**, **HTMX**, **jQuery**, or **Stimulus** via `--js=...`, and give every project light + dark mode out of the box with `--theme`. See the full [stack roadmap](docs/stack-roadmap.md).
 - 🌐 **Web installer** — `laravel web` serves a local wizard that walks every `laravel new` option, live-validates the project name, disables databases with missing PDO extensions, shows the equivalent CLI command before installing, and streams the install log to your browser.
 - 🔒 **Loopback-only by design** — the web UI binds to `127.0.0.1`; an optional [Herd front controller](public/index.php) proxies it at a friendly `.test` domain.
 - 🤖 **Agent-aware** — when run by an AI coding agent, the installer suppresses prompts and emits a machine-readable JSON result ([details](docs/agent-integration.md)).

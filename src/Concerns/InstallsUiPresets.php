@@ -44,6 +44,75 @@ trait InstallsUiPresets
                 '@php artisan adminlte:install',
             ],
         ],
+        'bulma' => [
+            'label' => 'Bulma',
+            'packages' => ['bulma' => '^1.0'],
+            'css' => "@import 'bulma/css/bulma.min.css';\n",
+        ],
+        'uikit' => [
+            'label' => 'UIkit',
+            'packages' => ['uikit' => '^3.21'],
+            'css' => "@import 'uikit/dist/css/uikit.min.css';\n",
+            'js' => "import UIkit from 'uikit';\nimport Icons from 'uikit/dist/js/uikit-icons';\nUIkit.use(Icons);\nwindow.UIkit = UIkit;\n",
+        ],
+        'pico' => [
+            'label' => 'Pico CSS',
+            'packages' => ['@picocss/pico' => '^2.0'],
+            'css' => "@import '@picocss/pico/css/pico.min.css';\n",
+        ],
+    ];
+
+    /**
+     * The available JavaScript enhancements for Blade applications.
+     *
+     * Additive — npm packages plus an app.js bootstrap, leaving the CSS
+     * setup (Tailwind or a UI preset) untouched.
+     */
+    protected static array $jsEnhancements = [
+        'alpine' => [
+            'label' => 'Alpine.js',
+            'packages' => ['alpinejs' => '^3.14'],
+            'js' => "import Alpine from 'alpinejs';\n\nwindow.Alpine = Alpine;\n\nAlpine.start();\n",
+        ],
+        'htmx' => [
+            'label' => 'HTMX',
+            'packages' => ['htmx.org' => '^2.0'],
+            'js' => "import htmx from 'htmx.org';\n\nwindow.htmx = htmx;\n",
+        ],
+        'jquery' => [
+            'label' => 'jQuery',
+            'packages' => ['jquery' => '^3.7'],
+            'js' => "import \$ from 'jquery';\n\nwindow.\$ = window.jQuery = \$;\n",
+        ],
+        'stimulus' => [
+            'label' => 'Stimulus',
+            'packages' => ['@hotwired/stimulus' => '^3.2'],
+            'js' => "import { Application } from '@hotwired/stimulus';\n\nwindow.Stimulus = Application.start();\n",
+        ],
+    ];
+
+    /**
+     * The available project types.
+     *
+     * "web" is the plain skeleton; the others run additional setup after
+     * the application is created.
+     */
+    protected static array $projectTypes = [
+        'web' => [
+            'label' => 'Web application',
+            'commands' => [],
+        ],
+        'api' => [
+            'label' => 'API only',
+            'commands' => ['@php artisan install:api --no-interaction'],
+        ],
+        'dashboard' => [
+            'label' => 'Filament dashboard',
+            'commands' => [
+                '@composer require filament/filament -W',
+                '@php artisan filament:install --panels --no-interaction',
+            ],
+        ],
     ];
 
     /**
@@ -113,6 +182,58 @@ trait InstallsUiPresets
     }
 
     /**
+     * Validate the JavaScript enhancement input.
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function validateJsOption(InputInterface $input): void
+    {
+        $js = $input->getOption('js');
+
+        if (! $js) {
+            return;
+        }
+
+        if (! array_key_exists($js, static::$jsEnhancements)) {
+            throw new InvalidArgumentException(
+                "Invalid JavaScript enhancement [{$js}]. Possible values are: ".implode(', ', array_keys(static::$jsEnhancements)).'.'
+            );
+        }
+
+        if ($this->usingStarterKit($input)) {
+            throw new InvalidArgumentException(
+                'The --js option only applies to vanilla applications. Starter kits ship their own frontend stack.'
+            );
+        }
+    }
+
+    /**
+     * Validate the project type input.
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function validateTypeOption(InputInterface $input): void
+    {
+        $type = $input->getOption('type');
+
+        if (! $type) {
+            return;
+        }
+
+        if (! array_key_exists($type, static::$projectTypes)) {
+            throw new InvalidArgumentException(
+                "Invalid project type [{$type}]. Possible values are: ".implode(', ', array_keys(static::$projectTypes)).'.'
+            );
+        }
+
+        if ($type !== 'web' && $this->usingStarterKit($input)) {
+            throw new InvalidArgumentException(
+                'The --type option only applies to vanilla applications. Starter kits ship their own scaffolding.'
+            );
+        }
+    }
+
+    /**
      * Validate the SPA scaffold input.
      *
      * @throws InvalidArgumentException
@@ -160,6 +281,126 @@ trait InstallsUiPresets
         $output->writeln("  <fg=green>{$preset['label']} UI preset applied.</>");
 
         $this->commitChanges("Install {$preset['label']} UI preset", $directory, $input, $output);
+    }
+
+    /**
+     * Add the selected JavaScript enhancement to the application.
+     */
+    protected function installJsEnhancement(string $directory, InputInterface $input, OutputInterface $output): void
+    {
+        $enhancement = static::$jsEnhancements[$input->getOption('js')];
+
+        $this->addNodeDependencies($directory, $enhancement['packages']);
+        $this->appendToAppJs($directory, $enhancement['js']);
+
+        $output->writeln("  <fg=green>{$enhancement['label']} added.</>");
+
+        $this->commitChanges("Add {$enhancement['label']}", $directory, $input, $output);
+    }
+
+    /**
+     * Run the selected project type's additional setup.
+     */
+    protected function installProjectType(string $directory, InputInterface $input, OutputInterface $output): void
+    {
+        $type = static::$projectTypes[$input->getOption('type')];
+
+        if (empty($type['commands'])) {
+            return;
+        }
+
+        $output->writeln("  Setting up the {$type['label']} project type...");
+
+        $this->runPresetCommands(['label' => $type['label']] + $type, $directory, $output);
+
+        $output->writeln("  <fg=green>{$type['label']} setup complete.</>");
+
+        $this->commitChanges("Set up {$type['label']}", $directory, $input, $output);
+    }
+
+    /**
+     * Write the light/dark theme helper and import it from app.js.
+     *
+     * Sets data-theme + data-bs-theme on <html> and toggles the "dark"
+     * class, covering Tailwind, Bootstrap 5.3+, and custom CSS hooks.
+     */
+    protected function installThemeToggle(string $directory, InputInterface $input, OutputInterface $output): void
+    {
+        $themePath = $directory.'/resources/js/theme.js';
+
+        if (! is_dir(dirname($themePath))) {
+            return;
+        }
+
+        file_put_contents($themePath, implode("\n", [
+            "const apply = (theme) => {",
+            "    document.documentElement.dataset.theme = theme;",
+            "    document.documentElement.setAttribute('data-bs-theme', theme);",
+            "    document.documentElement.classList.toggle('dark', theme === 'dark');",
+            "};",
+            '',
+            "const stored = localStorage.getItem('theme');",
+            "const preferred = stored ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');",
+            '',
+            'apply(preferred);',
+            '',
+            "window.setTheme = (theme) => {",
+            "    localStorage.setItem('theme', theme);",
+            '    apply(theme);',
+            '};',
+            '',
+            "window.toggleTheme = () => {",
+            "    window.setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');",
+            '};',
+            '',
+        ]));
+
+        $this->appendToAppJs($directory, "import './theme';\n");
+
+        $output->writeln('  <fg=green>Light/dark theme helper added (window.toggleTheme).</>');
+
+        $this->commitChanges('Add theme toggle helper', $directory, $input, $output);
+    }
+
+    /**
+     * Add npm packages to the application without touching existing ones.
+     */
+    protected function addNodeDependencies(string $directory, array $packages): void
+    {
+        $packageJsonPath = $directory.'/package.json';
+
+        if (! file_exists($packageJsonPath)) {
+            return;
+        }
+
+        $packageJson = json_decode((string) file_get_contents($packageJsonPath), true);
+
+        if (! is_array($packageJson)) {
+            return;
+        }
+
+        foreach ($packages as $package => $version) {
+            $packageJson['devDependencies'][$package] = $version;
+        }
+
+        ksort($packageJson['devDependencies']);
+
+        file_put_contents(
+            $packageJsonPath,
+            json_encode($packageJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL
+        );
+    }
+
+    /**
+     * Append the given JavaScript to the application's app.js entry point.
+     */
+    protected function appendToAppJs(string $directory, string $javascript): void
+    {
+        $jsPath = $directory.'/resources/js/app.js';
+
+        if (file_exists($jsPath)) {
+            file_put_contents($jsPath, rtrim((string) file_get_contents($jsPath))."\n\n".$javascript);
+        }
     }
 
     /**
@@ -252,10 +493,8 @@ trait InstallsUiPresets
             file_put_contents($cssPath, $preset['css']);
         }
 
-        $jsPath = $directory.'/resources/js/app.js';
-
-        if (file_exists($jsPath)) {
-            file_put_contents($jsPath, rtrim((string) file_get_contents($jsPath))."\n\n".$preset['js']);
+        if (isset($preset['js'])) {
+            $this->appendToAppJs($directory, $preset['js']);
         }
     }
 

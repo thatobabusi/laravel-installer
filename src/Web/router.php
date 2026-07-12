@@ -66,7 +66,13 @@ if ($uri === '/api/check-name' && $method === 'GET') {
         json_response(['valid' => false, 'error' => 'The name may only contain letters, numbers, dashes, underscores, and periods.']);
     }
 
-    $directory = $targetCwd.DIRECTORY_SEPARATOR.$name;
+    $location = trim((string) ($_GET['location'] ?? ''));
+
+    if ($location !== '' && ! is_dir($location)) {
+        json_response(['valid' => false, 'error' => 'The target location does not exist.']);
+    }
+
+    $directory = ($location !== '' ? rtrim($location, '/\\') : $targetCwd).DIRECTORY_SEPARATOR.$name;
 
     if (is_dir($directory) || is_file($directory)) {
         json_response(['valid' => false, 'error' => 'Application already exists.']);

@@ -1,9 +1,9 @@
 {
     "bin/laravel": "b8ec7d02d99ad17cd2d24aaef6a0fee2381526844d74b1b8b23102e6258f202a",
-    "src/NewCommand.php": "dcd6b32c53621b929ee80709166eddc235c8f954bb0ba826e852921efa22ecbb",
-    "src/PackageCommand.php": "6a6e8d9b82ec045cd8174e447a698bf72bc495219b3752ccdaed9411df33979e",
-    "src/WebCommand.php": "722113dac4b122ea47152b74977dcaeb7718e4ebf99491d3b832cb5c2647712f",
-    "src/Web/router.php": "19e716aa9eb9df7d2a5adb44cb062ff3b7b4333a52fa7d5992d4af021b5da6df",
+    "src/NewCommand.php": "ce50432f3972d09f83923e8b16f878cb7c6f8d828e8f517a7aac8c664885e275",
+    "src/PackageCommand.php": "0a0710cf78e3d0396af6ad14a73b86a5f10859f58c8cfe071c7bc1f40491080d",
+    "src/WebCommand.php": "8378adb61c570d93cd1ad486fde51f48e696bd2bf4a5967c2222ab4307459dce",
+    "src/Web/router.php": "fe034fe4700192309ec966dfcd2b38a139418b5970885ff51c68310e187e67f9",
     "src/Agent.php": "dd64f6a40ea8b9cb67171c21f76ca33b5f9b24183a126f99e3e82deb843e62c2",
-    "src/Concerns/InstallsUiPresets.php": "48cb5763ee697a85c9711f7f5fc1654037929753c02508105e6a0bc68f0bdc12"
+    "src/Concerns/InstallsUiPresets.php": "131331d652b4936227b07a7867582c6c46b573088151da7dd98a1092453aef2e"
 }

@@ -9,6 +9,7 @@ This folder documents the executable in this repository. It covers installer-spe
 - [Web installer](web-installer.md)
 - [Agent integration](agent-integration.md)
 - [Maintaining documentation](maintaining-docs.md)
+- [Stack roadmap](stack-roadmap.md)
 - [Upstream sync](upstream-sync.md)
 - [Generated command reference](reference/command-help.md)
 

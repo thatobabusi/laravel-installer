@@ -37,11 +37,37 @@ class WebCommandFlagsTest extends TestCase
 
     public function test_blank_blade_maps_ui_presets()
     {
-        foreach (['bootstrap', 'coreui', 'adminlte', 'laravel-adminlte'] as $preset) {
+        foreach (['bootstrap', 'coreui', 'adminlte', 'laravel-adminlte', 'bulma', 'uikit', 'pico'] as $preset) {
             $flags = $this->command()->flagsPublic(['stack' => 'blade', 'ui' => $preset]);
 
             $this->assertContains('--ui='.$preset, $flags);
         }
+    }
+
+    public function test_blank_blade_maps_js_enhancements_and_theme()
+    {
+        foreach (['alpine', 'htmx', 'jquery', 'stimulus'] as $js) {
+            $flags = $this->command()->flagsPublic(['stack' => 'blade', 'js' => $js, 'theme' => true]);
+
+            $this->assertContains('--js='.$js, $flags);
+            $this->assertContains('--theme', $flags);
+        }
+
+        $reactFlags = $this->command()->flagsPublic(['stack' => 'react', 'js' => 'alpine', 'theme' => true]);
+        $this->assertSame([], preg_grep('/^--js=/', $reactFlags));
+        $this->assertNotContains('--theme', $reactFlags);
+    }
+
+    public function test_project_types_map_to_the_type_flag()
+    {
+        foreach (['api', 'dashboard'] as $type) {
+            $flags = $this->command()->flagsPublic(['stack' => 'blade', 'type' => $type]);
+
+            $this->assertContains('--type='.$type, $flags);
+        }
+
+        $webFlags = $this->command()->flagsPublic(['stack' => 'blade', 'type' => 'web']);
+        $this->assertSame([], preg_grep('/^--type=/', $webFlags));
     }
 
     public function test_spa_stacks_map_to_the_spa_flag()

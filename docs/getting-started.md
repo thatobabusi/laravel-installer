@@ -57,6 +57,18 @@ laravel new admin --ui=bootstrap --no-authentication --database=sqlite --npm
 # (also: --spa=angular, --spa=nuxt, --spa=sveltekit, --spa=astro)
 laravel new platform --spa=next --no-authentication --database=sqlite --no-node
 
+# API-only backend: Sanctum + routes/api.php via install:api
+laravel new mobile-api --type=api --no-authentication --database=sqlite --no-node
+
+# Filament admin dashboard
+laravel new admin-panel --type=dashboard --no-authentication --database=sqlite --npm
+
+# "Modern Laravel": Blade + Tailwind + Alpine + light/dark theme helper
+laravel new modern --js=alpine --theme --no-authentication --database=sqlite --npm
+
+# "Classic Laravel": Blade + Bootstrap 5 + jQuery
+laravel new classic --ui=bootstrap --js=jquery --no-authentication --database=sqlite --npm
+
 # Vue starter kit and a public GitHub repository
 laravel new portal --vue --github=--public --organization=acme
 

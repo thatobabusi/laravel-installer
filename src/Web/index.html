@@ -91,6 +91,12 @@
     .toggle-row.on .switch { background: var(--accent); }
     .toggle-row.on .switch::after { left: 21px; }
     .nav { display: flex; justify-content: space-between; margin-top: 26px; }
+    .nav span { display: flex; gap: 10px; align-items: center; }
+    button[data-skip] {
+        background: none; border: none; color: var(--muted);
+        font-size: 13px; padding: 10px 6px;
+    }
+    button[data-skip]:hover { color: var(--text); }
     button {
         font-size: 14px; font-weight: 500; padding: 10px 22px;
         border-radius: 8px; border: 1px solid var(--border);
@@ -153,14 +159,49 @@
                 <input type="text" id="name" placeholder="my-app" autocomplete="off" autofocus>
                 <div class="hint" id="nameHint">Letters, numbers, dashes, underscores, and periods only.</div>
             </div>
+            <details>
+                <summary>Create in a different directory</summary>
+                <input type="text" id="location" placeholder="e.g. D:\Projects (must already exist)" autocomplete="off">
+            </details>
             <div class="nav">
                 <span></span>
                 <button class="primary" id="nameNext" disabled>Continue</button>
             </div>
         </div>
 
-        <!-- Step 2: Stack -->
+        <!-- Step 2: Project type -->
         <div class="card step hidden" data-step="1">
+            <h2>Project type</h2>
+            <p class="sub">What are you building? This tailors the remaining steps.</p>
+            <div class="field">
+                <div class="options wide">
+                    <div class="opt" data-group="type" data-value="web">
+                        <div class="name">Web application</div>
+                        <div class="desc">The full Laravel experience — pick a frontend next</div>
+                    </div>
+                    <div class="opt" data-group="type" data-value="api">
+                        <div class="name">API only</div>
+                        <div class="desc">Sanctum + API routes via install:api, no frontend</div>
+                    </div>
+                    <div class="opt" data-group="type" data-value="dashboard">
+                        <div class="name">Dashboard</div>
+                        <div class="desc">Filament admin panel on the TALL stack</div>
+                    </div>
+                    <div class="opt" data-group="type" data-value="package">
+                        <div class="name">Package</div>
+                        <div class="desc">A Laravel package skeleton (laravel package)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav">
+                <button data-nav="back">Back</button>
+                <span><button data-skip>Skip to review</button>
+                <button class="primary" data-nav="next">Continue</button></span>
+            </div>
+        </div>
+
+        <!-- Step 3: Stack -->
+        <div class="card step hidden" data-step="2">
             <h2>Choose your stack</h2>
             <p class="sub">Pick a starter kit with authentication scaffolding, or start from a blank slate.</p>
 
@@ -181,32 +222,6 @@
             <div class="field">
                 <label class="title">Frontend stack</label>
                 <div class="options" id="stackOptions"></div>
-            </div>
-
-            <div class="field hidden" id="uiField">
-                <label class="title">UI framework</label>
-                <div class="options">
-                    <div class="opt" data-group="ui" data-value="none">
-                        <div class="name">Tailwind</div>
-                        <div class="desc">Default skeleton styling</div>
-                    </div>
-                    <div class="opt" data-group="ui" data-value="bootstrap">
-                        <div class="name">Bootstrap 5</div>
-                        <div class="desc">Swaps Tailwind for Bootstrap</div>
-                    </div>
-                    <div class="opt" data-group="ui" data-value="coreui">
-                        <div class="name">CoreUI 5</div>
-                        <div class="desc">Open-source admin UI kit</div>
-                    </div>
-                    <div class="opt" data-group="ui" data-value="adminlte">
-                        <div class="name">AdminLTE 4</div>
-                        <div class="desc">Bootstrap 5 admin dashboard</div>
-                    </div>
-                    <div class="opt" data-group="ui" data-value="laravel-adminlte">
-                        <div class="name">Laravel AdminLTE</div>
-                        <div class="desc">jeroennoten/laravel-adminlte package</div>
-                    </div>
-                </div>
             </div>
 
             <div class="field hidden" id="authField">
@@ -246,12 +261,82 @@
 
             <div class="nav">
                 <button data-nav="back">Back</button>
-                <button class="primary" data-nav="next">Continue</button>
+                <span><button data-skip>Skip to review</button>
+                <button class="primary" data-nav="next">Continue</button></span>
             </div>
         </div>
 
-        <!-- Step 3: Options -->
-        <div class="card step hidden" data-step="2">
+        <!-- Step 4: Frontend extras (blank Blade only) -->
+        <div class="card step hidden" data-step="3">
+            <h2>Frontend extras</h2>
+            <p class="sub">Style and interactivity for your Blade application.</p>
+
+            <div class="field" id="uiField">
+                <label class="title">UI framework</label>
+                <div class="options">
+                    <div class="opt" data-group="ui" data-value="none">
+                        <div class="name">Tailwind</div>
+                        <div class="desc">Default skeleton styling</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="bootstrap">
+                        <div class="name">Bootstrap 5</div>
+                        <div class="desc">Swaps Tailwind for Bootstrap</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="bulma">
+                        <div class="name">Bulma</div>
+                        <div class="desc">Modern CSS-only framework</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="uikit">
+                        <div class="name">UIkit</div>
+                        <div class="desc">Lightweight modular framework</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="pico">
+                        <div class="name">Pico CSS</div>
+                        <div class="desc">Minimal semantic styling</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="coreui">
+                        <div class="name">CoreUI 5</div>
+                        <div class="desc">Open-source admin UI kit</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="adminlte">
+                        <div class="name">AdminLTE 4</div>
+                        <div class="desc">Bootstrap 5 admin dashboard</div>
+                    </div>
+                    <div class="opt" data-group="ui" data-value="laravel-adminlte">
+                        <div class="name">Laravel AdminLTE</div>
+                        <div class="desc">jeroennoten/laravel-adminlte package</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field" id="jsField">
+                <label class="title">JavaScript enhancement</label>
+                <div class="options">
+                    <div class="opt" data-group="js" data-value="none"><div class="name">None</div></div>
+                    <div class="opt" data-group="js" data-value="alpine"><div class="name">Alpine.js</div></div>
+                    <div class="opt" data-group="js" data-value="htmx"><div class="name">HTMX</div></div>
+                    <div class="opt" data-group="js" data-value="jquery"><div class="name">jQuery</div></div>
+                    <div class="opt" data-group="js" data-value="stimulus"><div class="name">Stimulus</div></div>
+                </div>
+            </div>
+
+            <div class="toggle-row on" data-toggle="theme">
+                <div class="label">
+                    <div class="name">Light &amp; dark theme helper</div>
+                    <div class="desc">window.toggleTheme() with system preference + localStorage</div>
+                </div>
+                <div class="switch"></div>
+            </div>
+
+            <div class="nav">
+                <button data-nav="back">Back</button>
+                <span><button data-skip>Skip to review</button>
+                <button class="primary" data-nav="next">Continue</button></span>
+            </div>
+        </div>
+
+        <!-- Step 5: Options -->
+        <div class="card step hidden" data-step="4">
             <h2>Application options</h2>
             <p class="sub">Database, testing, and tooling for the new application.</p>
 
@@ -289,12 +374,13 @@
 
             <div class="nav">
                 <button data-nav="back">Back</button>
-                <button class="primary" data-nav="next">Continue</button>
+                <span><button data-skip>Skip to review</button>
+                <button class="primary" data-nav="next">Continue</button></span>
             </div>
         </div>
 
-        <!-- Step 4: Git -->
-        <div class="card step hidden" data-step="3">
+        <!-- Step 6: Git -->
+        <div class="card step hidden" data-step="5">
             <h2>Version control</h2>
             <p class="sub">Optionally initialize Git and create a GitHub repository.</p>
 
@@ -323,12 +409,13 @@
 
             <div class="nav">
                 <button data-nav="back">Back</button>
-                <button class="primary" data-nav="next">Continue</button>
+                <span><button data-skip>Skip to review</button>
+                <button class="primary" data-nav="next">Continue</button></span>
             </div>
         </div>
 
-        <!-- Step 5: Review -->
-        <div class="card step hidden" data-step="4">
+        <!-- Step 7: Review -->
+        <div class="card step hidden" data-step="6">
             <h2>Review &amp; install</h2>
             <p class="sub">Everything the installer is about to do.</p>
             <table class="summary-table" id="summaryTable"></table>
@@ -340,7 +427,7 @@
         </div>
 
         <!-- Progress -->
-        <div class="card step hidden" data-step="5">
+        <div class="card step hidden" data-step="7">
             <h2 id="progressTitle"><span class="spinner"></span>Creating your application…</h2>
             <p class="sub" id="progressSub">This can take a few minutes while Composer and npm do their thing.</p>
             <div id="resultBanner"></div>
@@ -357,9 +444,13 @@
     const state = {
         name: '',
         nameValid: false,
+        location: '',
+        type: 'web',
         starterKit: 'yes',
         stack: 'react',
         ui: 'none',
+        js: 'none',
+        theme: true,
         using: '',
         auth: 'laravel',
         singleFile: true,
@@ -375,7 +466,8 @@
 
     let env = { databases: {}, targetDirectory: '', separator: '/' };
     let currentStep = 0;
-    const stepCount = 6;
+    const stepCount = 8;
+    const REVIEW_STEP = 6;
 
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => [...document.querySelectorAll(sel)];
@@ -388,16 +480,31 @@
         dots.appendChild(d);
     }
 
+    // A step is skipped when it doesn't apply to the chosen project type/stack...
+    function stepApplies(n) {
+        if (state.type === 'package') return ![2, 3, 4, 5].includes(n);
+        if (state.type === 'api' || state.type === 'dashboard') return ![2, 3].includes(n);
+        if (n === 3) return state.starterKit === 'no' && state.stack === 'blade' && !state.using;
+        return true;
+    }
+
     function showStep(n) {
         currentStep = n;
         $$('.step').forEach(el => el.classList.toggle('hidden', +el.dataset.step !== n));
         $$('#stepDots .dot').forEach((d, i) => d.classList.toggle('active', i <= Math.min(n, stepCount - 2)));
-        if (n === 4) renderSummary();
+        if (n === REVIEW_STEP) renderSummary();
     }
 
     document.addEventListener('click', (e) => {
+        if (e.target.closest('[data-skip]')) { showStep(REVIEW_STEP); return; }
+
         const nav = e.target.closest('[data-nav]');
-        if (nav) showStep(currentStep + (nav.dataset.nav === 'next' ? 1 : -1));
+        if (!nav) return;
+
+        const direction = nav.dataset.nav === 'next' ? 1 : -1;
+        let n = currentStep + direction;
+        while (n > 0 && n < REVIEW_STEP && !stepApplies(n)) n += direction;
+        showStep(Math.max(0, Math.min(n, REVIEW_STEP)));
     });
 
     // --- Option cards & toggles ------------------------------------------
@@ -416,6 +523,10 @@
 
     $('#using').addEventListener('input', (e) => { state.using = e.target.value.trim(); syncUi(); });
     $('#organization').addEventListener('input', (e) => { state.organization = e.target.value.trim(); });
+    $('#location').addEventListener('input', (e) => {
+        state.location = e.target.value.trim();
+        $('#name').dispatchEvent(new Event('input'));
+    });
 
     const SPA_STACKS = { angular: 'Angular', next: 'Next.js', nuxt: 'Nuxt', sveltekit: 'SvelteKit', astro: 'Astro' };
 
@@ -456,7 +567,6 @@
         $$('[data-toggle]').forEach(t => t.classList.toggle('on', !!state[t.dataset.toggle]));
 
         const kit = state.starterKit === 'yes' && !state.using;
-        $('#uiField').classList.toggle('hidden', !(state.starterKit === 'no' && state.stack === 'blade' && !state.using));
         $('#authField').classList.toggle('hidden', !kit);
         $('#livewireSingleFile').classList.toggle('hidden', !(kit && state.stack === 'livewire' && state.auth === 'laravel'));
         $('#teamsToggle').classList.toggle('hidden', !(kit && (state.stack !== 'livewire' || state.auth === 'workos' || state.singleFile)));
@@ -485,7 +595,7 @@
 
     async function checkName(request, name) {
         try {
-            const res = await fetch(`/api/check-name?name=${encodeURIComponent(name)}`);
+            const res = await fetch(`/api/check-name?name=${encodeURIComponent(name)}&location=${encodeURIComponent(state.location)}`);
             const data = await res.json();
 
             // Ignore a response for a value the user has already changed.
@@ -522,12 +632,18 @@
 
     // --- Summary -----------------------------------------------------------
     function jobPayload() {
+        const web = state.type === 'web';
+
         return {
             name: state.name,
-            starterKit: state.starterKit === 'yes',
-            stack: state.stack,
-            ui: state.ui,
-            using: state.using || null,
+            location: state.location || null,
+            type: state.type,
+            starterKit: web && state.starterKit === 'yes',
+            stack: web ? state.stack : 'blade',
+            ui: web ? state.ui : 'none',
+            js: web ? state.js : 'none',
+            theme: web && state.theme,
+            using: (web && state.using) || null,
             auth: state.auth,
             livewireClassComponents: !state.singleFile,
             teams: state.teams,
@@ -542,8 +658,14 @@
     }
 
     function cliCommand() {
+        if (state.type === 'package') {
+            return `laravel package ${state.name} --no-interaction`;
+        }
+
         const parts = ['laravel new', state.name];
-        if (state.using) {
+        if (state.type !== 'web') {
+            parts.push(`--type=${state.type}`, '--no-authentication');
+        } else if (state.using) {
             parts.push(`--using=${state.using}`);
         } else if (state.starterKit === 'yes') {
             parts.push(`--${state.stack}`);
@@ -554,6 +676,8 @@
             if (state.stack in SPA_STACKS) parts.push(`--spa=${state.stack}`);
             else if (state.stack !== 'blade') parts.push(`--${state.stack}`);
             else if (state.ui !== 'none') parts.push(`--ui=${state.ui}`);
+            if (state.stack === 'blade' && state.js !== 'none') parts.push(`--js=${state.js}`);
+            if (state.stack === 'blade' && state.theme) parts.push('--theme');
             parts.push('--no-authentication');
         }
         parts.push(`--database=${state.database}`);
@@ -572,9 +696,18 @@
 
     function renderSummary() {
         const rows = [];
+        const typeLabels = { web: 'Web application', api: 'API only (Sanctum via install:api)', dashboard: 'Filament dashboard', package: 'Laravel package' };
         rows.push(['Project', state.name]);
-        rows.push(['Location', env.targetDirectory + env.separator + state.name]);
-        if (state.using) {
+        rows.push(['Type', typeLabels[state.type] || state.type]);
+        rows.push(['Location', (state.location || env.targetDirectory) + env.separator + state.name]);
+        if (state.type === 'package') {
+            $('#summaryTable').innerHTML = rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+            $('#cliPreview').textContent = '$ ' + cliCommand();
+            return;
+        }
+        if (state.type !== 'web') {
+            // API and dashboard types skip the stack steps entirely...
+        } else if (state.using) {
             rows.push(['Starter kit', state.using]);
         } else if (state.starterKit === 'yes') {
             rows.push(['Starter kit', `${state.stack} (official)`]);
@@ -585,9 +718,12 @@
             rows.push(['Stack', `${SPA_STACKS[state.stack]} SPA in frontend/ + Laravel API backend`]);
         } else {
             rows.push(['Stack', `${state.stack} (blank, no authentication)`]);
-            if (state.stack === 'blade' && state.ui !== 'none') {
-                const uiLabels = { bootstrap: 'Bootstrap 5', coreui: 'CoreUI 5', adminlte: 'AdminLTE 4', 'laravel-adminlte': 'Laravel AdminLTE' };
+            if (state.stack === 'blade') {
+                const uiLabels = { none: 'Tailwind (default)', bootstrap: 'Bootstrap 5', bulma: 'Bulma', uikit: 'UIkit', pico: 'Pico CSS', coreui: 'CoreUI 5', adminlte: 'AdminLTE 4', 'laravel-adminlte': 'Laravel AdminLTE' };
+                const jsLabels = { alpine: 'Alpine.js', htmx: 'HTMX', jquery: 'jQuery', stimulus: 'Stimulus' };
                 rows.push(['UI framework', uiLabels[state.ui] || state.ui]);
+                if (state.js !== 'none') rows.push(['JavaScript', jsLabels[state.js] || state.js]);
+                rows.push(['Theme helper', state.theme ? 'Light & dark (window.toggleTheme)' : 'No']);
             }
         }
         rows.push(['Database', state.database]);
@@ -621,7 +757,7 @@
         logOffset = 0;
         $('#terminal').textContent = '';
         $('#resultBanner').innerHTML = '';
-        showStep(5);
+        showStep(7);
         polling = setInterval(poll, 1000);
     });
 
