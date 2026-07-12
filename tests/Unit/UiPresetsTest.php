@@ -74,6 +74,21 @@ class UiPresetsTest extends TestCase
                 return static::$uiPresets[$name];
             }
 
+            public function spaScaffoldPublic(string $name): array
+            {
+                return static::$spaScaffolds[$name];
+            }
+
+            public function validateSpaPublic(array $options): array
+            {
+                $input = new ArrayInput($options, $this->getDefinition());
+
+                $this->validateUiOption($input);
+                $this->validateSpaOption($input);
+
+                return ['ui' => $input->getOption('ui'), 'spa' => $input->getOption('spa')];
+            }
+
             public function swapPublic(string $directory, array $preset): void
             {
                 $this->swapNodeDependenciesForPreset($directory, $preset);
@@ -95,9 +110,40 @@ class UiPresetsTest extends TestCase
     {
         $command = $this->command();
 
-        foreach (['bootstrap', 'coreui', 'adminlte', 'laravel-adminlte', 'angular'] as $preset) {
+        foreach (['bootstrap', 'coreui', 'adminlte', 'laravel-adminlte'] as $preset) {
             $this->assertNotEmpty($command->presetPublic($preset)['label']);
         }
+
+        foreach (['angular', 'next', 'nuxt', 'sveltekit', 'astro'] as $scaffold) {
+            $this->assertNotEmpty($command->spaScaffoldPublic($scaffold)['label']);
+        }
+    }
+
+    public function test_spa_scaffolds_are_validated()
+    {
+        $resolved = $this->command()->validateSpaPublic(['name' => 'demo', '--spa' => 'next']);
+        $this->assertSame('next', $resolved['spa']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid SPA scaffold');
+
+        $this->command()->validateSpaPublic(['name' => 'demo', '--spa' => 'backbone']);
+    }
+
+    public function test_spa_scaffolds_reject_starter_kits()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('vanilla applications');
+
+        $this->command()->validateSpaPublic(['name' => 'demo', '--spa' => 'nuxt', '--vue' => true]);
+    }
+
+    public function test_ui_angular_aliases_to_the_spa_option()
+    {
+        $resolved = $this->command()->validateSpaPublic(['name' => 'demo', '--ui' => 'angular']);
+
+        $this->assertNull($resolved['ui']);
+        $this->assertSame('angular', $resolved['spa']);
     }
 
     public function test_it_rejects_unknown_presets()
@@ -193,7 +239,7 @@ class UiPresetsTest extends TestCase
         $this->assertFileExists($this->appDirectory.'/preset-marker.txt');
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Broken UI preset failed');
+        $this->expectExceptionMessage('Broken preset failed');
 
         $command->installPublic('broken', $this->appDirectory);
     }

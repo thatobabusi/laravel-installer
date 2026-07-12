@@ -41,7 +41,8 @@ Options:
       --boost                      Install Laravel Boost to improve AI assisted coding
       --no-boost                   Skip Laravel Boost installation
       --using[=USING]              Install a custom starter kit from a community maintained package
-      --ui=UI                      Apply a UI preset to a vanilla application. Possible values are: bootstrap, coreui, adminlte, laravel-adminlte, angular
+      --ui=UI                      Apply a UI preset to a vanilla application. Possible values are: bootstrap, coreui, adminlte, laravel-adminlte
+      --spa=SPA                    Scaffold an SPA frontend in frontend/ alongside the application. Possible values are: angular, next, nuxt, sveltekit, astro
   -f, --force                      Forces install even if the directory already exists
   -h, --help                       Display help for the given command. When no command is given display help for the list command
       --silent                     Do not output any message

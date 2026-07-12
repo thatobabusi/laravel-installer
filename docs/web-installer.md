@@ -29,7 +29,7 @@ Choose an official starter kit with authentication scaffolding, or start blank:
 
 ![Stack step with the official starter kits](images/02-starter-kits.png)
 
-When the Blank setup with the Blade stack is selected, a **UI framework** choice appears: keep the default Tailwind skeleton, or apply a preset — Bootstrap 5, CoreUI 5, AdminLTE 4, the Laravel AdminLTE Composer package, or an Angular SPA scaffold (`--ui=bootstrap|coreui|adminlte|laravel-adminlte|angular`):
+The Blank setup's stack row also offers modern SPA frontends — Angular, Next.js, Nuxt, SvelteKit, and Astro — each scaffolded in `frontend/` alongside the Laravel backend (`--spa=angular|next|nuxt|sveltekit|astro`). When the Blade stack is selected, a **UI framework** choice appears: keep the default Tailwind skeleton, or apply a preset — Bootstrap 5, CoreUI 5, AdminLTE 4, or the Laravel AdminLTE Composer package (`--ui=bootstrap|coreui|adminlte|laravel-adminlte`):
 
 ![Blank Blade setup offering the UI framework presets](images/03-ui-presets.png)
 

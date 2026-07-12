@@ -71,7 +71,17 @@ test.describe('stack step conditionals', () => {
         await expect(page.locator('#authField')).toBeHidden();
 
         const presets = page.locator('#uiField .opt .name');
-        await expect(presets).toHaveText(['Tailwind', 'Bootstrap 5', 'CoreUI 5', 'AdminLTE 4', 'Laravel AdminLTE', 'Angular']);
+        await expect(presets).toHaveText(['Tailwind', 'Bootstrap 5', 'CoreUI 5', 'AdminLTE 4', 'Laravel AdminLTE']);
+    });
+
+    test('blank setups offer the SPA stacks and hide UI presets for them', async ({ page }) => {
+        await page.click('.opt[data-group="starterKit"][data-value="no"]');
+
+        const stacks = page.locator('#stackOptions .opt .name');
+        await expect(stacks).toHaveText(['Blade', 'React', 'Svelte', 'Vue', 'Livewire', 'Angular', 'Next.js', 'Nuxt', 'SvelteKit', 'Astro']);
+
+        await page.click('.opt[data-group="stack"][data-value="next"]');
+        await expect(page.locator('#uiField')).toBeHidden();
     });
 
     test('livewire starter kit exposes the single-file component toggle', async ({ page }) => {

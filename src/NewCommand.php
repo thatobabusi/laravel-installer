@@ -120,7 +120,8 @@ class NewCommand extends Command
             ->addOption('boost', null, InputOption::VALUE_NONE, 'Install Laravel Boost to improve AI assisted coding')
             ->addOption('no-boost', null, InputOption::VALUE_NONE, 'Skip Laravel Boost installation')
             ->addOption('using', null, InputOption::VALUE_OPTIONAL, 'Install a custom starter kit from a community maintained package')
-            ->addOption('ui', null, InputOption::VALUE_REQUIRED, 'Apply a UI preset to a vanilla application. Possible values are: bootstrap, coreui, adminlte, laravel-adminlte, angular')
+            ->addOption('ui', null, InputOption::VALUE_REQUIRED, 'Apply a UI preset to a vanilla application. Possible values are: bootstrap, coreui, adminlte, laravel-adminlte')
+            ->addOption('spa', null, InputOption::VALUE_REQUIRED, 'Scaffold an SPA frontend in frontend/ alongside the application. Possible values are: angular, next, nuxt, sveltekit, astro')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists');
     }
 
@@ -557,6 +558,7 @@ class NewCommand extends Command
 
         $this->validateDatabaseOption($input);
         $this->validateUiOption($input);
+        $this->validateSpaOption($input);
 
         $name = rtrim($input->getArgument('name'), '/\\');
 
@@ -690,6 +692,10 @@ class NewCommand extends Command
 
             if ($input->getOption('ui') && ! $this->usingStarterKit($input)) {
                 $this->installUiPreset($directory, $input, $output);
+            }
+
+            if ($input->getOption('spa') && ! $this->usingStarterKit($input)) {
+                $this->installSpaScaffold($directory, $input, $output);
             }
 
             if ($input->getOption('github') !== false) {

@@ -253,7 +253,9 @@ class WebCommand extends Command
         } else {
             if (in_array($stack, ['react', 'svelte', 'vue', 'livewire'], true)) {
                 $flags[] = '--'.$stack;
-            } elseif (in_array($job['ui'] ?? null, ['bootstrap', 'coreui', 'adminlte', 'laravel-adminlte', 'angular'], true)) {
+            } elseif (in_array($stack, ['angular', 'next', 'nuxt', 'sveltekit', 'astro'], true)) {
+                $flags[] = '--spa='.$stack;
+            } elseif (in_array($job['ui'] ?? null, ['bootstrap', 'coreui', 'adminlte', 'laravel-adminlte'], true)) {
                 $flags[] = '--ui='.$job['ui'];
             }
 

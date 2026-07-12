@@ -206,10 +206,6 @@
                         <div class="name">Laravel AdminLTE</div>
                         <div class="desc">jeroennoten/laravel-adminlte package</div>
                     </div>
-                    <div class="opt" data-group="ui" data-value="angular">
-                        <div class="name">Angular</div>
-                        <div class="desc">SPA scaffold in frontend/ via Angular CLI</div>
-                    </div>
                 </div>
             </div>
 
@@ -421,17 +417,21 @@
     $('#using').addEventListener('input', (e) => { state.using = e.target.value.trim(); syncUi(); });
     $('#organization').addEventListener('input', (e) => { state.organization = e.target.value.trim(); });
 
+    const SPA_STACKS = { angular: 'Angular', next: 'Next.js', nuxt: 'Nuxt', sveltekit: 'SvelteKit', astro: 'Astro' };
+
     function renderStacks() {
         const kit = state.starterKit === 'yes';
         const stacks = kit
             ? [['react', 'React'], ['svelte', 'Svelte'], ['vue', 'Vue'], ['livewire', 'Livewire']]
-            : [['blade', 'Blade'], ['react', 'React'], ['svelte', 'Svelte'], ['vue', 'Vue'], ['livewire', 'Livewire']];
+            : [['blade', 'Blade'], ['react', 'React'], ['svelte', 'Svelte'], ['vue', 'Vue'], ['livewire', 'Livewire'],
+               ...Object.entries(SPA_STACKS)];
 
         if (!stacks.some(([v]) => v === state.stack)) state.stack = stacks[0][0];
 
         $('#stackOptions').innerHTML = stacks.map(([v, label]) => {
             const desc = v === 'blade' ? 'No frontend scaffolding'
                 : v === 'livewire' ? 'Laravel, Livewire, Tailwind'
+                : v in SPA_STACKS ? `${label} SPA in frontend/ + Laravel API`
                 : `Laravel, Inertia, ${label}, Tailwind`;
             return `<div class="opt" data-group="stack" data-value="${v}"><div class="name">${label}</div><div class="desc">${desc}</div></div>`;
         }).join('');
@@ -551,7 +551,8 @@
             if (state.stack === 'livewire' && !state.singleFile) parts.push('--livewire-class-components');
             if (state.teams) parts.push('--teams');
         } else {
-            if (state.stack !== 'blade') parts.push(`--${state.stack}`);
+            if (state.stack in SPA_STACKS) parts.push(`--spa=${state.stack}`);
+            else if (state.stack !== 'blade') parts.push(`--${state.stack}`);
             else if (state.ui !== 'none') parts.push(`--ui=${state.ui}`);
             parts.push('--no-authentication');
         }
@@ -580,10 +581,12 @@
             rows.push(['Authentication', state.auth === 'workos' ? 'WorkOS' : 'Laravel built-in']);
             if (state.stack === 'livewire') rows.push(['Livewire components', state.singleFile ? 'Single-file' : 'Class components']);
             if (state.teams) rows.push(['Teams', 'Enabled']);
+        } else if (state.stack in SPA_STACKS) {
+            rows.push(['Stack', `${SPA_STACKS[state.stack]} SPA in frontend/ + Laravel API backend`]);
         } else {
             rows.push(['Stack', `${state.stack} (blank, no authentication)`]);
             if (state.stack === 'blade' && state.ui !== 'none') {
-                const uiLabels = { bootstrap: 'Bootstrap 5', coreui: 'CoreUI 5', adminlte: 'AdminLTE 4', 'laravel-adminlte': 'Laravel AdminLTE', angular: 'Angular (SPA in frontend/)' };
+                const uiLabels = { bootstrap: 'Bootstrap 5', coreui: 'CoreUI 5', adminlte: 'AdminLTE 4', 'laravel-adminlte': 'Laravel AdminLTE' };
                 rows.push(['UI framework', uiLabels[state.ui] || state.ui]);
             }
         }

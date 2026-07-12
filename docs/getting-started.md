@@ -50,8 +50,12 @@ laravel new blog --react --database=pgsql --pest --pnpm --git --no-interaction
 laravel new api --no-authentication --database=sqlite --no-node
 
 # Blank Laravel application scaffolded with Bootstrap 5
-# (also: --ui=coreui, --ui=adminlte, --ui=laravel-adminlte, --ui=angular)
+# (also: --ui=coreui, --ui=adminlte, --ui=laravel-adminlte)
 laravel new admin --ui=bootstrap --no-authentication --database=sqlite --npm
+
+# Laravel API backend + a Next.js SPA scaffolded in frontend/
+# (also: --spa=angular, --spa=nuxt, --spa=sveltekit, --spa=astro)
+laravel new platform --spa=next --no-authentication --database=sqlite --no-node
 
 # Vue starter kit and a public GitHub repository
 laravel new portal --vue --github=--public --organization=acme

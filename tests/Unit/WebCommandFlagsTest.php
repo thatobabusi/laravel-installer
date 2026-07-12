@@ -37,10 +37,21 @@ class WebCommandFlagsTest extends TestCase
 
     public function test_blank_blade_maps_ui_presets()
     {
-        foreach (['bootstrap', 'coreui', 'adminlte', 'laravel-adminlte', 'angular'] as $preset) {
+        foreach (['bootstrap', 'coreui', 'adminlte', 'laravel-adminlte'] as $preset) {
             $flags = $this->command()->flagsPublic(['stack' => 'blade', 'ui' => $preset]);
 
             $this->assertContains('--ui='.$preset, $flags);
+        }
+    }
+
+    public function test_spa_stacks_map_to_the_spa_flag()
+    {
+        foreach (['angular', 'next', 'nuxt', 'sveltekit', 'astro'] as $spa) {
+            $flags = $this->command()->flagsPublic(['stack' => $spa]);
+
+            $this->assertContains('--spa='.$spa, $flags);
+            $this->assertContains('--no-authentication', $flags);
+            $this->assertSame([], preg_grep('/^--ui=/', $flags));
         }
     }
 

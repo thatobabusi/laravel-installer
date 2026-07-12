@@ -44,11 +44,36 @@ trait InstallsUiPresets
                 '@php artisan adminlte:install',
             ],
         ],
+    ];
+
+    /**
+     * The available SPA frontend scaffolds.
+     *
+     * Each scaffold creates a standalone frontend workspace in frontend/
+     * alongside the Laravel backend. Dependency installation is skipped so
+     * the scaffold step stays fast — run the package manager inside
+     * frontend/ afterwards.
+     */
+    protected static array $spaScaffolds = [
         'angular' => [
             'label' => 'Angular',
-            'commands' => [
-                'npx --yes @angular/cli@latest new frontend --defaults --skip-git',
-            ],
+            'commands' => ['npx --yes @angular/cli@latest new frontend --defaults --skip-git --skip-install'],
+        ],
+        'next' => [
+            'label' => 'Next.js',
+            'commands' => ['npx --yes create-next-app@latest frontend --yes --ts --eslint --app --no-src-dir --tailwind --import-alias "@/*" --use-npm --skip-install'],
+        ],
+        'nuxt' => [
+            'label' => 'Nuxt',
+            'commands' => ['npx --yes nuxi@latest init frontend --template v4 --packageManager npm --no-gitInit --no-install'],
+        ],
+        'sveltekit' => [
+            'label' => 'SvelteKit',
+            'commands' => ['npx --yes sv@latest create frontend --template minimal --types ts --no-add-ons --no-install'],
+        ],
+        'astro' => [
+            'label' => 'Astro',
+            'commands' => ['npx --yes create-astro@latest frontend --template minimal --no-install --no-git --yes'],
         ],
     ];
 
@@ -59,6 +84,15 @@ trait InstallsUiPresets
      */
     protected function validateUiOption(InputInterface $input): void
     {
+        // --ui=angular predates the --spa option; keep it working as an alias...
+        if ($input->getOption('ui') === 'angular') {
+            $input->setOption('ui', null);
+
+            if (! $input->getOption('spa')) {
+                $input->setOption('spa', 'angular');
+            }
+        }
+
         $ui = $input->getOption('ui');
 
         if (! $ui) {
@@ -79,6 +113,32 @@ trait InstallsUiPresets
     }
 
     /**
+     * Validate the SPA scaffold input.
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function validateSpaOption(InputInterface $input): void
+    {
+        $spa = $input->getOption('spa');
+
+        if (! $spa) {
+            return;
+        }
+
+        if (! array_key_exists($spa, static::$spaScaffolds)) {
+            throw new InvalidArgumentException(
+                "Invalid SPA scaffold [{$spa}]. Possible values are: ".implode(', ', array_keys(static::$spaScaffolds)).'.'
+            );
+        }
+
+        if ($this->usingStarterKit($input)) {
+            throw new InvalidArgumentException(
+                'The --spa option only applies to vanilla applications. Starter kits ship their own frontend stack.'
+            );
+        }
+    }
+
+    /**
      * Apply the selected UI preset to the freshly created application.
      */
     protected function installUiPreset(string $directory, InputInterface $input, OutputInterface $output): void
@@ -94,30 +154,57 @@ trait InstallsUiPresets
         if (! empty($preset['commands'])) {
             $output->writeln("  Applying the {$preset['label']} UI preset...");
 
-            foreach ($preset['commands'] as $command) {
-                // Run preset commands verbatim — tools like the Angular CLI reject
-                // the --no-ansi / --quiet flags runCommands() appends...
-                $process = Process::fromShellCommandline(
-                    $this->normalizeInstallerHookCommand($command),
-                    $directory,
-                    null,
-                    null,
-                    null,
-                );
-
-                $process->run(function ($type, $line) use ($output) {
-                    $output->write('    '.$line);
-                });
-
-                if (! $process->isSuccessful()) {
-                    throw new RuntimeException("The {$preset['label']} UI preset failed to install. Command failed: {$command}");
-                }
-            }
+            $this->runPresetCommands($preset, $directory, $output);
         }
 
         $output->writeln("  <fg=green>{$preset['label']} UI preset applied.</>");
 
         $this->commitChanges("Install {$preset['label']} UI preset", $directory, $input, $output);
+    }
+
+    /**
+     * Scaffold the selected SPA frontend workspace alongside the application.
+     */
+    protected function installSpaScaffold(string $directory, InputInterface $input, OutputInterface $output): void
+    {
+        $scaffold = static::$spaScaffolds[$input->getOption('spa')];
+
+        $output->writeln("  Scaffolding the {$scaffold['label']} frontend in frontend/...");
+
+        $this->runPresetCommands($scaffold, $directory, $output);
+
+        $output->writeln("  <fg=green>{$scaffold['label']} frontend scaffolded. Run your package manager inside frontend/ to install its dependencies.</>");
+
+        $this->commitChanges("Scaffold {$scaffold['label']} frontend", $directory, $input, $output);
+    }
+
+    /**
+     * Run the given preset's commands verbatim inside the application.
+     *
+     * Tools like the Angular CLI reject the --no-ansi / --quiet flags that
+     * runCommands() appends, so preset commands bypass that decoration.
+     *
+     * @throws RuntimeException
+     */
+    protected function runPresetCommands(array $preset, string $directory, OutputInterface $output): void
+    {
+        foreach ($preset['commands'] as $command) {
+            $process = Process::fromShellCommandline(
+                $this->normalizeInstallerHookCommand($command),
+                $directory,
+                null,
+                null,
+                null,
+            );
+
+            $process->run(function ($type, $line) use ($output) {
+                $output->write('    '.$line);
+            });
+
+            if (! $process->isSuccessful()) {
+                throw new RuntimeException("The {$preset['label']} preset failed to install. Command failed: {$command}");
+            }
+        }
     }
 
     /**
