@@ -5,7 +5,8 @@
     "scripts": {
         "test:e2e": "playwright test",
         "test:e2e:headed": "playwright test --headed",
-        "test:e2e:install": "cross-env E2E_INSTALL=1 playwright test"
+        "test:e2e:install": "cross-env E2E_INSTALL=1 playwright test",
+        "docs:screenshots": "cross-env DOCS_SCREENSHOTS=1 playwright test screenshots"
     },
     "devDependencies": {
         "@playwright/test": "^1.49.0",

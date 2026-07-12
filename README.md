@@ -48,6 +48,10 @@ laravel new my-app        # the classic CLI wizard
 laravel web               # the same wizard, in your browser
 ```
 
+<div align="center">
+<img src="docs/images/03-ui-presets.png" alt="The laravel web wizard offering starter kits and UI framework presets" width="720" />
+</div>
+
 <h2 align="center">✨ Features</h2>
 
 - 🚀 **Everything upstream** — starter kits (React, Svelte, Vue, Livewire), WorkOS auth, teams, database setup, Pest/PHPUnit, npm/pnpm/bun/yarn, Laravel Boost, Git and GitHub publishing.
