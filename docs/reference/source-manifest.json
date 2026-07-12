@@ -1,5 +1,5 @@
 {
-    "bin/laravel": "e91a7a1504c9f0951dba0b2b4b013277b94e14daf5d83c39fd5ed0ea3d4a0ffc",
+    "bin/laravel": "b8ec7d02d99ad17cd2d24aaef6a0fee2381526844d74b1b8b23102e6258f202a",
     "src/NewCommand.php": "7adbd5588f9e80b662b43c36720e5a039134e9797024e9b69fb932066305c2c7",
     "src/PackageCommand.php": "6a6e8d9b82ec045cd8174e447a698bf72bc495219b3752ccdaed9411df33979e",
     "src/WebCommand.php": "24870fbd02056a587f3cd415b9c022ae19cf1f1e2fceeabf97f31f98fb96d130",
