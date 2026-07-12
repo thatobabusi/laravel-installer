@@ -27,7 +27,7 @@
 
 <br/>
 
-**[🌍 Visit the Website](https://thatobabusi.co.za)** · **[📦 Releases](https://github.com/thatobabusi/laravel-installer/releases)** · **[📚 Docs](docs/README.md)** · **[📜 Changelog](CHANGELOG.md)**
+**[🌍 Visit the Website](https://thatobabusi.co.za)** · **[📦 Releases](https://github.com/thatobabusi/laravel-installer/releases)** · **[📚 Docs](docs/README.md)** · **[📜 Changelog](docs/system/CHANGELOG.md)**
 
 </div>
 
